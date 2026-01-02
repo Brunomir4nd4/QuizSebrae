@@ -1,0 +1,67 @@
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+*:focus {
+  outline: none;
+}
+
+:root {
+  --white: '#ffffff';
+  --primary-color: #1EFF9D;
+  --light-black: #222325;
+  --grey: #71767F;
+  --medium-black: #2C2E30;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer components {
+  .bg-rgb-15 {
+    background-color: rgba(115, 120, 141, 0.15);
+  }
+
+  .selected-date {
+    &:before {
+      width: 0;
+      height: 0;
+      border-left: 50px solid transparent;
+      border-right: 50px solid transparent;
+      border-bottom: 86.6px solid black;
+      content: '';
+      position: absolute;
+      background-color: black;
+    }
+  }
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#blip-chat-open-iframe {
+  display: none !important;
+  /* padrão: display none */
+}
+
+#blip-chat-open-iframe.opened {
+  display: initial !important;
+  height: auto !important;
+  /* ou display: inline, flex, etc., conforme o que você quiser */
+}

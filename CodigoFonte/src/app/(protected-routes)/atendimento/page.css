@@ -1,0 +1,6 @@
+@media (min-width: 1280px) {
+    .button-card {
+        position: absolute;
+        bottom: 1.5rem;
+    }
+}

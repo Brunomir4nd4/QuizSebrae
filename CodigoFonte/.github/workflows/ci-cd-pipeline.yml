@@ -1,0 +1,124 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - '**'  # Executa em todas as branches
+  pull_request:
+    branches:
+      - '**'  # Executa em PRs para todas as branches
+  release:
+    types: [published]  # Executa quando uma release é publicada
+
+jobs:
+  # Job de build que executa sempre (todas as branches)
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v3
+
+      - name: Normalizar nome da branch para tag Docker
+        id: normalize_tag
+        run: |
+          # Normaliza o nome da branch para ser compatível com tags Docker
+          # Remove caracteres especiais e substitui por hífen
+          NORMALIZED_TAG=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g' | tr '[:upper:]' '[:lower:]')
+          echo "tag=${NORMALIZED_TAG}" >> $GITHUB_OUTPUT
+          echo "Normalized tag: ${NORMALIZED_TAG}"
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v2
+    
+      - name: Fazer login no Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Construir e enviar imagem Docker
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_REPOSITORY }}/${{ github.event.repository.name }}:${{ steps.normalize_tag.outputs.tag }}
+            ${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_REPOSITORY }}/${{ github.event.repository.name }}:${{ github.sha }}
+
+  # Job de deploy para ambiente de piloto (somente branch develop)
+  deploy-piloto:
+    runs-on: oke-we-002
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    env:
+      NAMESPACE: piloto-dhedalos-ecosystem
+      CLUSTER: oke-we-002
+
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v3
+    
+      - name: Configurar Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.8.0'
+
+      - name: Fazer deploy no ambiente piloto
+        run: |
+          helm dependency build helm
+          helm upgrade --install --create-namespace -n ${{ env.NAMESPACE }} ${{ github.event.repository.name }} helm -f kubernetes/${{ env.CLUSTER }}/${{ env.NAMESPACE }}/values.yaml \
+            --set image.repository=${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_REPOSITORY }}/${{ github.event.repository.name }} \
+            --set image.tag=${{ github.sha }}
+
+  # Job de deploy para ambiente de produção do projeto Essencia (somente branch main)
+  deploy-essencia:
+    runs-on: oke-we-001
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    env:
+      NAMESPACE: essencia-ecosystem
+      CLUSTER: oke-we-001
+
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v3
+    
+      - name: Configurar Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.8.0'
+
+      - name: Fazer deploy no ambiente piloto
+        run: |
+          helm dependency build helm
+          helm upgrade --install --create-namespace -n ${{ env.NAMESPACE }} ${{ github.event.repository.name }} helm -f kubernetes/${{ env.CLUSTER }}/${{ env.NAMESPACE }}/values.yaml \
+            --set image.repository=${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_REPOSITORY }}/${{ github.event.repository.name }} \
+            --set image.tag=${{ github.sha }}
+
+  # Job de deploy para produção (somente branch main)
+  deploy-prod:
+    runs-on: oke-we-001
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    env:
+      NAMESPACE: dhedalos-ecosystem
+      CLUSTER: oke-we-001
+
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v3
+    
+      - name: Configurar Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.8.0'
+
+      - name: Fazer deploy no ambiente de produção
+        run: |
+          helm dependency build helm
+          helm upgrade --install --create-namespace -n ${{ env.NAMESPACE }} ${{ github.event.repository.name }} helm -f kubernetes/${{ env.CLUSTER }}/${{ env.NAMESPACE }}/values.yaml \
+            --set image.repository=${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_REPOSITORY }}/${{ github.event.repository.name }} \
+            --set image.tag=${{ github.sha }}

@@ -1,0 +1,113 @@
+import { Button, styled } from '@mui/material';
+
+export const PrevButton = styled(Button)({
+	width: '60px',
+	minWidth: '60px',
+	height: '60px',
+	padding: '6px',
+	borderRadius: '30px',
+	background: '#222325!important',
+	boxShadow:
+		'0px 2px 10px 0px rgba(0, 0, 0, 0.25), 0px 10px 50px 0px rgba(0, 0, 0, 0.10)',
+	cursor: 'pointer',
+	textTransform: 'none',
+	position: 'absolute',
+	top: 'inherit',
+	left: '50%',
+	bottom: '20px',
+	transform: 'translateX(-105%)',
+	zIndex: '99',
+	'&:before': {
+		content: 'none',
+	},
+	'&:after': {
+		content: '""',
+		width: '100%',
+		height: '100%',
+		position: 'absolute',
+		background: 'rgba(0,0,0,0.4)',
+		borderRadius: '40px',
+		opacity: '0.2',
+		left: '0',
+		bottom: '0',
+		transition: 'all 0.2s ease-out',
+	},
+	div: {
+		width: '48px',
+		height: '48px',
+		background: 'linear-gradient(166deg, #06EBBD -3.37%, #1EFF9D 104.04%)',
+		borderRadius: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	'&:hover': {
+		background: '#222325',
+		'&:after': {
+			width: 'calc(100% + 10px)',
+			height: 'calc(100% + 10px)',
+			left: '-5px',
+			bottom: '-5px',
+		},
+	},
+	'@media (max-width: 600px)': {
+		marginTop: '0px',
+		margin: '0',
+	},
+});
+
+export const NextButton = styled(Button)({
+	width: '60px',
+	minWidth: '60px',
+	height: '60px',
+	padding: '6px',
+	borderRadius: '30px',
+	background: '#222325!important',
+	boxShadow:
+		'0px 2px 10px 0px rgba(0, 0, 0, 0.25), 0px 10px 50px 0px rgba(0, 0, 0, 0.10)',
+	cursor: 'pointer',
+	textTransform: 'none',
+	position: 'absolute',
+	top: 'inherit',
+	right: '50%',
+	bottom: '20px',
+	transform: 'translateX(105%)',
+	zIndex: '99',
+	'&:before': {
+		content: 'none',
+	},
+	'&:after': {
+		content: '""',
+		width: '100%',
+		height: '100%',
+		position: 'absolute',
+		background: 'rgba(0,0,0,0.4)',
+		borderRadius: '40px',
+		opacity: '0.2',
+		left: '0',
+		bottom: '0',
+		transition: 'all 0.2s ease-out',
+	},
+	div: {
+		width: '48px',
+		height: '48px',
+		background: 'linear-gradient(166deg, #06EBBD -3.37%, #1EFF9D 104.04%)',
+		borderRadius: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	'&:hover': {
+		background: '#222325',
+		'&:after': {
+			width: 'calc(100% + 10px)',
+			height: 'calc(100% + 10px)',
+			left: '-5px',
+			bottom: '-5px',
+		},
+	},
+	'@media (max-width: 600px)': {
+		marginTop: '0px',
+		margin: '0',
+	},
+});

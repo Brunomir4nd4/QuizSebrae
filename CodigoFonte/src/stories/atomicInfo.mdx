@@ -1,0 +1,61 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import './Cores.css';
+
+<Meta title="Components/Info" />
+
+# 📚 Guia de Navegação dos Componentes
+
+Este documento explica **como os componentes estão organizados**.
+
+
+---
+
+## 🧭 Como está organizado
+
+Os componentes são divididos em três níveis, seguindo o conceito de **Atomic Design**.  
+Essa divisão serve **somente para organizar a documentação**, deixando tudo mais fácil de localizar e entender.
+
+### 🧪 **Atoms (Átomos)**  
+Componentes básicos, individuais e simples.  
+Geralmente são blocos mínimos de interface.
+
+Exemplos comuns:  
+- Botões simples  
+- Inputs  
+- Ícones  
+- Tipografia  
+- Labels  
+
+São elementos isolados e reutilizáveis.
+
+**Quando procurar aqui:**  
+Quando você quer encontrar **um componente pequeno**, sem comportamento complexo.
+
+---
+
+### 🧬 **Molecules (Moléculas)**  
+Combinações de dois ou mais Atoms formando algo com mais função.
+
+Exemplos comuns:  
+- Campo de busca composto por input + botão  
+- Card simples com imagem + título  
+- Pequenos agrupamentos de elementos visuais  
+
+**Quando procurar aqui:**  
+Quando você quer algo que **já combina mais de um elemento**, mas ainda é simples.
+
+---
+
+### 🧩 **Organisms (Organismos)**  
+Componentes maiores, geralmente usados para formar seções completas da UI.
+
+Exemplos comuns:  
+- Cabeçalhos (Header)  
+- Sidebars  
+- Cards grandes ou complexos  
+- Blocos de dashboard  
+
+**Quando procurar aqui:**  
+Quando você procura um **componente grande**, que monta uma parte inteira da interface.
+
+---

@@ -1,0 +1,280 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Guideline/Introdução" />
+
+# Plataforma Educacional Dhedalos
+
+## 🎯 Visão Geral
+
+O **Dhedalos Hub** é uma plataforma educacional completa desenvolvida em Next.js, projetada para conectar facilitadores e participantes em um ambiente de aprendizado digital. A aplicação oferece recursos robustos para gerenciamento de turmas, atividades, agendamentos e interações em tempo real.
+
+## 💡 Propósito
+
+A plataforma foi criada para democratizar o acesso à educação e capacitação profissional, permitindo que:
+
+- **Facilitadores** gerenciem turmas, avaliem atividades e acompanhem o progresso dos participantes
+- **Participantes** acessem conteúdos educacionais, enviem atividades e participem de mentorias
+- **Supervisores** monitorem e administrem múltiplas turmas e facilitadores
+
+
+## 🔐 Sistema de Autenticação
+
+### Tipos de Usuários
+
+A plataforma suporta três perfis de acesso distintos:
+
+#### 1. **Participante** (Aluno)
+- **Acesso**: Hub de participantes
+- **Credencial**: CPF único
+- **Permissões**: 
+  - Visualizar conteúdo educacional
+  - Enviar atividades e trabalhos
+  - Agendar mentorias individuais ou em grupo
+  - Participar de salas de aula virtuais
+  - Acompanhar notas e feedback
+
+#### 2. **Facilitador** 
+- **Acesso**: Hub de facilitadores
+- **Credencial**: CPF único
+- **Permissões**: 
+  - Gerenciar múltiplas turmas e ciclos
+  - Avaliar atividades com notas e feedback
+  - Agendar e conduzir mentorias
+  - Visualizar relatórios de participação
+  - Controlar presença de participantes
+  - Exportar dados de turmas
+
+#### 3. **Supervisor**
+- **Acesso**: Administrativo completo
+- **Credencial**: CPF único
+- **Permissões**: 
+  - Todas as permissões de facilitador
+  - **Modo Participante**: visualizar plataforma como qualquer aluno
+  - Administrar múltiplas turmas simultaneamente
+  - Acesso a dashboards e métricas globais
+
+### Fluxo de Autenticação
+
+1. **Login**
+   - Autenticação via CPF (usado como username e password)
+   - Integração com NextAuth.js
+   - Token JWT retornado pelo backend WordPress
+   - Sessão válida por 7 dias
+
+2. **Proteção de Rotas**
+   - **Rotas públicas**: login, páginas de curso
+   - **Rotas protegidas**: validação de sessão no servidor
+   - Middleware automático de autenticação
+
+3. **Sessão do Usuário**
+   ```typescript
+   interface Session {
+     user: {
+       id: number;
+       user_display_name: string;
+       user_email: string;
+       role: string[];
+       token: string;
+       cpf: string;
+     };
+   }
+   ```
+
+### 🎭 Modo Participante
+
+Recurso exclusivo para supervisores e facilitadores que permite:
+
+- Visualizar a plataforma exatamente como um participante específico vê
+- Testar funcionalidades do ponto de vista do aluno
+- Identificar problemas de UX e usabilidade
+- **Segurança**: sessão original preservada no localStorage
+- Retorno seguro à sessão original a qualquer momento
+- Logs de todas as ações realizadas no modo participante
+
+## 🚀 Funcionalidades Principais
+
+### 1. Gerenciamento de Turmas
+
+- Visualização de múltiplas turmas e ciclos
+- Troca rápida de contexto entre turmas
+- Informações detalhadas: curso, facilitador, participantes
+- Timeline de atividades e entregas
+
+### 2. Sistema de Atividades
+
+#### Envio (Participantes)
+- Upload de múltiplos formatos (PDF, imagens, documentos)
+- Suporte para reenvio e correção
+- Histórico de submissões
+- Status em tempo real
+
+#### Avaliação (Facilitadores)
+- Interface intuitiva de correção
+- Sistema de notas configurável
+- Feedback textual rico
+- Visualização lado a lado do trabalho
+
+#### Gestão (Supervisores)
+- Dashboard com métricas e estatísticas
+- Filtros avançados por turma, ciclo e status
+- Exportação de relatórios
+- Acompanhamento de prazos
+
+### 3. Agendamento de Mentorias
+
+- **Tipos de reunião**: 
+  - Individual (1-on-1 com facilitador)
+  - Em Grupo (múltiplos participantes)
+- Calendário interativo com slots disponíveis
+- Confirmação automática por e-mail
+- Integração com sistema de videoconferência
+- Gestão de conflitos de horário
+
+### 4. Salas Virtuais
+
+- **Sala de Aula**: ambiente para turma completa
+- **Mentoria Individual**: sala privada 1-on-1
+- Integração com plataforma de videoconferência
+- Gerenciamento automático de credenciais
+- Links de acesso seguro e temporário
+
+### 5. Controle de Participação
+
+- Marcação de presença em atividades síncronas
+- Registro de entregas de atividades assíncronas
+- Tabela interativa com filtros
+- Exportação de dados
+- Notificações via WhatsApp
+
+## 🔧 Arquitetura de Serviços
+
+### Backend For Frontend (BFF)
+
+Camada proxy segura em `src/app/api/` que:
+
+- Protege credenciais e tokens
+- Valida sessões do lado do servidor
+- Transforma dados entre formatos
+- Centraliza lógica de negócio
+- Gerencia cache e otimizações
+
+**Principais serviços:**
+- `ClassService`: Dados de turmas e ciclos
+- `SubmissionService`: Submissões de atividades
+- `CycleService`: Ciclos educacionais
+- `ParticipantModeLogs`: Auditoria de ações
+
+## 📊 Gerenciamento de Estado
+
+### Context Providers
+
+1. **UserProvider**: Contexto global do usuário
+   - Dados da turma ativa
+   - Configurações de tema
+   - Estado de erro global
+
+2. **SessionProvider**: Gerencia sessão NextAuth
+   - Renovação automática de token
+   - Sincronização entre abas
+
+3. **SubmissionsProvider**: Cache de submissões
+   - Otimização de requisições
+   - Atualização em tempo real
+
+## 🧪 Testes
+
+Cobertura abrangente com múltiplas estratégias:
+
+### Testes Unitários
+- Componentes isolados
+- Hooks customizados
+- Funções utilitárias
+
+### Testes de Integração
+- Fluxos completos de usuário
+- Interação entre componentes
+- Validação de APIs
+
+### Ferramentas
+- **Jest**: Runner principal
+- **React Testing Library**: Testes de componentes
+- **Vitest**: Testes rápidos com Vite
+- **Storybook Test**: Testes visuais
+
+### Estrutura de Diretórios
+
+```
+src/
+├── app/                          # App Router do Next.js
+│   ├── (protected-routes)/      # Rotas autenticadas
+│   ├── (public-routes)/         # Rotas públicas
+│   ├── api/                     # API Routes (BFF)
+│   ├── providers/               # Context Providers
+│   └── services/                # Camada de serviços
+├── components/                   # Componentes React reutilizáveis
+├── types/                        # TypeScript interfaces e types
+├── utils/                        # Funções utilitárias
+├── hooks/                        # Custom React hooks
+└── stories/                      # Documentação Storybook
+```
+
+
+## 🐳 Deployment
+
+### Docker
+
+Build otimizado em múltiplos estágios:
+
+```dockerfile
+# Standalone output do Next.js
+# Menor tamanho de imagem
+# Health checks configurados
+# Suporte AWS e OKE
+```
+
+## 🛠️ Modo de Manutenção
+
+Sistema configurável de manutenção programada:
+
+- Ativação via backend
+- Páginas customizadas por projeto
+- Mensagens específicas para usuários
+- Modo de bypass para administradores
+
+## 📚 Componentes Documentados
+
+Todos os componentes possuem stories no Storybook com:
+
+- **Props documentadas**: tipos, descrições e valores padrão
+- **Exemplos interativos**: playground para teste
+- **Variações**: diferentes estados e configurações
+- **Acessibilidade**: validação automática
+- **Testes visuais**: chromatic integration
+
+---
+
+## 🚀 Como Começar
+
+1. **Instale as dependências**
+   ```bash
+   npm install
+   ```
+
+2. **Configure as variáveis de ambiente**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Rode o ambiente de desenvolvimento**
+   ```bash
+   npm run dev
+   ```
+
+4. **Acesse o Storybook**
+   ```bash
+   npm run storybook
+   ```
+
+---
+
+Esta plataforma representa uma solução completa para educação digital, combinando tecnologias modernas com uma arquitetura escalável, segura e manutenível.

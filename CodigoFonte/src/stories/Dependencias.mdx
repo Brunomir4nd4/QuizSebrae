@@ -1,0 +1,141 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Guideline/Dependencias" />
+
+# Dependências do Projeto
+
+Abaixo está a lista das dependências e dependências de desenvolvimento usadas por este projeto (extraídas do `package.json`).
+
+## Dependências principais (dependencies)
+
+### Framework e bibliotecas core
+- **React**: ^18
+- **React DOM**: ^18
+- **Next.js**: 14.2.6
+- **Next Auth**: ^4.24.5
+
+### UI e componentes
+- **Material UI** (`@mui/material`): ^5.15.7
+- **Material UI Icons** (`@mui/icons-material`): ^5.15.7
+- **Emotion React**: ^11.11.3
+- **Emotion Styled**: ^11.11.0
+- **Headless UI React**: ^1.7.18
+- **Heroicons React**: ^2.1.1
+- **React Slick**: ^0.30.1
+- **Slick Carousel**: ^1.8.1
+
+### Gerenciamento de estado e dados
+- **React Query**: ^3.39.3
+- **TanStack Query Core**: ^5.18.1
+
+### Utilitários e ferramentas
+- **Day.js**: ^1.11.10
+- **Luxon**: ^3.4.4
+- **JS Cookie**: ^3.0.5
+- **Memory Cache**: ^0.2.0
+- **React PDF**: ^9.2.1
+
+### Integrações e monitoramento
+- **Datadog Browser Logs**: ^5.15.0
+- **Datadog Browser RUM**: ^5.15.0
+- **Jitsi React SDK**: ^1.4.0
+- **Blip Chat Widget**: ^1.11.0
+- **Next Third Parties**: ^14.1.3
+
+## Dependências de desenvolvimento (devDependencies)
+
+### Testing
+- **Jest**: ^29.7.0
+- **Babel Jest**: ^29.7.0
+- **Jest Environment JSDOM**: ^29.7.0
+- **TS Jest**: ^29.2.5
+- **Vitest**: ^3.1.2
+- **Vitest Browser**: ^3.1.2
+- **Vitest Coverage V8**: ^3.1.2
+- **Playwright**: ^1.52.0
+
+### Testing Library
+- **Testing Library React**: ^16.3.0
+- **Testing Library DOM**: ^10.4.0
+- **Testing Library Jest DOM**: ^6.9.1
+- **Testing Library User Event**: ^14.6.1
+
+### Storybook
+- **Storybook**: ^10.0.6
+- **Storybook NextJS**: ^10.0.6
+- **Storybook NextJS Vite**: ^10.0.6
+- **Storybook Addon Docs**: ^10.0.6
+- **Storybook Addon Onboarding**: ^10.0.6
+- **Storybook Addon Vitest**: 10.0.6
+- **Storybook Jest**: ^0.2.3
+- **Storybook Testing Library**: ^0.2.2
+- **Chromatic Storybook**: ^4.1.2
+- **ESLint Plugin Storybook**: ^10.0.6
+
+### TypeScript e tipos
+- **TypeScript**: ^5.7.2
+- **TS Node**: ^10.9.2
+- **@types/node**: ^20
+- **@types/react**: ^18
+- **@types/react-dom**: ^18
+- **@types/jest**: ^29.5.14
+- **@types/js-cookie**: ^3.0.6
+- **@types/luxon**: ^3.4.2
+- **@types/marked**: ^5.0.2
+- **@types/memory-cache**: ^0.2.5
+- **@types/react-slick**: ^0.23.13
+
+### Linting e formatação
+- **ESLint**: ^8.57.1
+- **ESLint Config Next**: ^15.0.3
+- **ESLint Config Prettier**: ^9.1.0
+- **ESLint Plugin Jest**: ^28.9.0
+- **TypeScript ESLint Plugin**: ^8.17.0
+- **TypeScript ESLint Parser**: ^8.17.0
+- **Prettier**: ^3.4.2
+- **Lint Staged**: ^15.2.10
+
+### Build e CSS
+- **PostCSS**: ^8
+- **Tailwind CSS**: ^3.3.0
+- **Autoprefixer**: ^10.0.1
+
+### Outros
+- **Babel Preset Env**: ^7.26.0
+- **TanStack ESLint Plugin Query**: ^5.18.1
+- **TanStack React Query DevTools**: ^5.18.1
+- **Husky**: ^9.1.7
+- **Marked**: ^17.0.1
+
+## Plugins do Visual Studio
+
+- **EditorConfig**: docs / plugin
+- **ESLint**: plugin
+
+## Observações e comandos úteis
+
+- Para instalar todas as dependências:
+
+```bash
+npm install
+```
+
+- Para rodar o Storybook (porta padrão 6006):
+
+```bash
+npm run storybook
+```
+
+- Para rodar a aplicação Next.js em modo dev:
+
+```bash
+npm run dev
+```
+
+- Se houver problemas com o Storybook relacionados a versões do Node.js, verifique a versão atual:
+
+```bash
+node --version
+```
+
+Recomendamos manter o Node.js atualizado (pelo menos v20.19+ ou v22.12+ para a versão atual do Storybook no projeto).

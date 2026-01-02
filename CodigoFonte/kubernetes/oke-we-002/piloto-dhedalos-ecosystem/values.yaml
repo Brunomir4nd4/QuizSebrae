@@ -1,0 +1,15 @@
+fullnameOverride: "dhedalos-app-frontend-hub"
+
+replicaCount: 1
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-nginx
+    nginx.ingress.kubernetes.io/affinity: cookie
+  hosts:
+    - piloto.sebraeingresse.com.br
+  tls:
+    - secretName: dhedalos-app-frontend-hub
+      hosts:
+        - piloto.sebraeingresse.com.br

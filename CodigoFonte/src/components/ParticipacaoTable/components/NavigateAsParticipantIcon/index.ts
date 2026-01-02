@@ -1,0 +1,1 @@
+export { NavigateAsParticipantIcon } from './NavigateAsParticipantIcon.component';

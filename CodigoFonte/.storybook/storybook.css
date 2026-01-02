@@ -1,0 +1,134 @@
+/* Load Ample Alt fonts */
+@font-face {
+  font-family: '__ampleAlt_ca2dbd';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltBold/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_ca2dbd';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltMedium/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_ca2dbd';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltRegular/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_ca2dbd';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltLight/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_ca2dbd';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltExtraLight/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_ca2dbd';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltThin/font.woff2') format('woff2');
+}
+
+/* Also expose alternate family names used in components */
+@font-face {
+  font-family: '__ampleAlt_76416d';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltBold/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_76416d';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltMedium/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_76416d';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltRegular/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_76416d';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltLight/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_76416d';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltExtraLight/font.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: '__ampleAlt_76416d';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltThin/font.woff2') format('woff2');
+}
+
+/* fallback family name used in some inline styles */
+@font-face {
+  font-family: '__ampleAlt_Fallback_76416d';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../public/fonts/AmpleAltRegular/font.woff2') format('woff2');
+}
+
+body,
+#storybook-root,
+#storybook-docs {
+  font-family: '__ampleAlt_ca2dbd', '__ampleAlt_Fallback_ca2dbd', sans-serif !important;
+}
+
+:root {
+  --tw-bg-opacity: 1;
+  --tw-border-opacity: 1;
+  --tw-text-opacity: 1;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+}
+
+*,
+::before,
+::after {
+  --tw-bg-opacity: 1;
+  --tw-border-opacity: 1;
+  --tw-text-opacity: 1;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+}

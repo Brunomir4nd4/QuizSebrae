@@ -1,0 +1,23 @@
+fullnameOverride: "dhedalos-app-frontend-hub"
+
+replicaCount: 1
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-native
+    nginx.ingress.kubernetes.io/affinity: cookie
+  hosts:
+    - hub.sebraeingresse.com.br
+    - facilitador.sebraeingresse.com.br
+    - supervisor.sebraeingresse.com.br
+  tls:
+    - secretName: dhedalos-app-frontend-hub
+      hosts:
+        - hub.sebraeingresse.com.br
+    - secretName: dhedalos-app-frontend-hub
+      hosts:
+        - facilitador.sebraeingresse.com.br
+    - secretName: dhedalos-app-frontend-hub
+      hosts:
+        - supervisor.sebraeingresse.com.br

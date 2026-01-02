@@ -1,0 +1,36 @@
+@font-face {
+    font-family: "AmpleAlt";
+    src: url('../../public/fonts/AmpleAltBold/font.woff2') format('woff2'), url('../../public/fonts/AmpleAltBold/font.woff') format('woff');
+    font-weight: "600";
+}
+@font-face {
+    font-family: "AmpleAlt";
+    src: url('../../public/fonts/AmpleAltMedium/font.woff2') format('woff2'), url('../../public/fonts/AmpleAltMedium/font.woff') format('woff');
+    font-weight: "500";
+}
+@font-face {
+    font-family: "AmpleAlt";
+    src: url('../../public/fonts/AmpleAltRegular/font.woff2') format('woff2'), url('../../public/fonts/AmpleAltRegular/font.woff') format('woff');
+    font-weight: "normal";
+}
+@font-face {
+    font-family: "AmpleAlt";
+    src: url('../../public/fonts/AmpleAltLight/font.woff2') format('woff2'), url('../../public/fonts/AmpleAltLight/font.woff') format('woff');
+    font-weight: "300";
+}
+@font-face {
+    font-family: "AmpleAlt";
+    src: url('../../public/fonts/AmpleAltLight/font.woff2') format('woff2'), url('../../public/fonts/AmpleAltLight/font.woff') format('woff');
+    font-weight: "200";
+}
+@font-face {
+    font-family: "AmpleAlt";
+    src: url('../../public/fonts/AmpleAltThin/font.woff2') format('woff2'), url('../../public/fonts/AmpleAltThin/font.woff') format('woff');
+    font-weight: "100";
+}
+
+@layer components {
+    .bg-rgb-15 {
+      background-color: rgba(115, 120, 141, 0.15);
+    }
+}

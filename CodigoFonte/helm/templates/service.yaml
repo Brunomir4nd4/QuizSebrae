@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dhedalos-app-frontend-nextjs.fullname" . }}
+  labels:
+    {{- include "dhedalos-app-frontend-nextjs.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "dhedalos-app-frontend-nextjs.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/module: http-app

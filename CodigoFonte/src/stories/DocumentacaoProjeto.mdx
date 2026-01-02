@@ -1,0 +1,145 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Guideline/Documentacao" />
+
+# Documentação do Projeto
+
+Esta página reúne as instruções essenciais para executar, entender e documentar o projeto Dhedalos Hub.
+
+---
+
+## Executando o projeto
+
+Siga as etapas abaixo para executar o projeto localmente.
+
+### Instale as dependências
+
+```bash
+npm install
+```
+
+### Execute o servidor de desenvolvimento (Next.js)
+
+```bash
+npm run dev
+```
+
+> Roda a aplicação Next.js em modo de desenvolvimento (porta padrão configurada no Next).
+
+### Build e ambiente de produção
+
+```bash
+# Gerar build de produção
+npm run build
+
+# Iniciar ambiente de produção
+npm run start
+```
+
+### Storybook
+
+```bash
+# Ambiente de desenvolvimento do Storybook (porta padrão 6006)
+npm run storybook
+
+# Gerar build estático do Storybook
+npm run build-storybook
+```
+
+> Observação: este projeto utiliza Storybook v10 (conforme dependências). Caso rode em uma máquina com Node.js desatualizado, o Storybook pode exigir Node >= 20.19.
+
+### Documentação Typedoc (opcional)
+
+Se o projeto tiver um script para gerar typedoc, utilize:
+
+```bash
+npm run generate-typedoc
+```
+
+> Caso não exista o script acima no `package.json`, adicione conforme necessidade.
+
+---
+
+## Estrutura de pastas (principais)
+
+```
+src/
+├── app/               # App Router do Next.js e rotas/handlers
+├── components/        # Componentes React reutilizáveis
+├── constants/         # Constantes do projeto
+├── hooks/             # Hooks personalizados
+├── resources/         # Assets e recursos (i18n, imagens)
+├── stories/           # Stories e documentação MDX para Storybook
+├── theme/             # Tema da aplicação (design tokens)
+├── types/             # Typescript interfaces e tipos
+└── utils/             # Helpers e serviços utilitários
+
+.storybook/            # Configuração do Storybook
+public/                # Arquivos estáticos públicos
+```
+
+Arquivos importantes no repositório:
+
+- `.storybook/main.ts` — config do Storybook
+- `next.config.js` — configuração do Next.js
+- `package.json` — scripts e dependências
+- `tsconfig.json` — configuração TypeScript
+
+---
+
+
+## Padrão de documentação e ferramentas
+
+Mantemos algumas convenções para garantir documentação consistente e útil para desenvolvedores e designers.
+
+### Storybook (versão usada neste projeto)
+
+- Versão principal: **v10** (veja `package.json`)
+- Addons comuns no projeto:
+  - `@storybook/addon-docs` / `@storybook/blocks` (MDX, docs)
+  - `@storybook/addon-essentials` (controls, actions, backgrounds etc.)
+  - `@storybook/addon-a11y` (acessibilidade)
+  - `@storybook/addon-jest` / `@storybook/addon-vitest` (integração de testes)
+  - `@chromatic-com/storybook` (visual testing)
+
+> Consulte `.storybook/main.ts` para a lista exata de addons configurados.
+
+### JSDoc / TypeScript comments
+
+Utilize comentários no padrão JSDoc para documentar componentes, funções e tipos. O Storybook pode aproveitar comentários JSDoc para preencher descrições automaticamente.
+
+Exemplo de comentário JSDoc para um componente:
+
+```tsx
+/**
+ * Componente de botão reutilizável.
+ *
+ * @component
+ */
+export const Button = ({ onClick, children }: { onClick: () => void; children: React.ReactNode }) => {
+  return <button onClick={onClick}>{children}</button>;
+};
+```
+
+---
+## Processos úteis
+
+- Verificar pacotes desatualizados:
+
+```bash
+npm outdated
+```
+
+- Executar testes unitários:
+
+```bash
+npm test
+```
+
+- Rodar linter e formatação:
+
+```bash
+npm run lint
+npm run prettier
+```
+

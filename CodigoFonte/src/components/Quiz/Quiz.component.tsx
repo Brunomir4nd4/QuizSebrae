@@ -1,9 +1,11 @@
 'use client';
 
 import { FunctionComponent, useState } from 'react';
-import { QuizProps, QuizQuestion } from './Quiz.interface';
+import { QuizProps, QuizQuestion, QuizActivity } from './Quiz.interface';
 import { QuizQuestionStep } from './components/QuizQuestionStep';
 import { QuizFeedbackStep } from './components/QuizFeedbackStep';
+import { QuizActivityStep } from './components/QuizActivityStep';
+import { QuizActivityFeedbackStep } from './components/QuizActivityFeedbackStep';
 
 // Dados mockados do quiz - em produção viriam de uma API
 const mockQuestions: QuizQuestion[] = [
@@ -39,7 +41,9 @@ const mockQuestions: QuizQuestion[] = [
 export const Quiz: FunctionComponent<QuizProps> = ({
 	totalQuestions = 5,
 	currentQuestion: initialQuestion = 1,
+	activities = [],
 	onAnswerSelect: externalOnAnswerSelect,
+	onActivitySubmit: externalOnActivitySubmit,
 	onNext,
 	onPrevious,
 }) => {
@@ -49,6 +53,15 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	}>({});
 	const [showFeedback, setShowFeedback] = useState<{
 		[questionId: number]: boolean;
+	}>({});
+	const [submittedActivities, setSubmittedActivities] = useState<{
+		[activityId: number]: boolean;
+	}>({});
+	const [activityFiles, setActivityFiles] = useState<{
+		[activityId: number]: File[];
+	}>({});
+	const [showActivityFeedback, setShowActivityFeedback] = useState<{
+		[activityId: number]: boolean;
 	}>({});
 
 	const handleAnswerSelect = (optionId: string) => {
@@ -102,12 +115,57 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		handleNext();
 	};
 
+	const handleActivitySubmit = (files: File[]) => {
+		// Busca a atividade atual
+		const currentActivity = activities.find((a) => a.id === currentQuestion);
+		if (currentActivity) {
+			setSubmittedActivities((prev) => ({
+				...prev,
+				[currentActivity.id]: true,
+			}));
+			setActivityFiles((prev) => ({
+				...prev,
+				[currentActivity.id]: files,
+			}));
+			setShowActivityFeedback((prev) => ({
+				...prev,
+				[currentActivity.id]: true,
+			}));
+
+			if (externalOnActivitySubmit) {
+				externalOnActivitySubmit(currentActivity.id, files);
+			}
+		}
+	};
+
+	const handleActivityFeedbackNext = () => {
+		// Limpa o feedback e vai para a próxima etapa
+		const currentActivity = activities.find((a) => a.id === currentQuestion);
+		if (currentActivity) {
+			setShowActivityFeedback((prev) => ({
+				...prev,
+				[currentActivity.id]: false,
+			}));
+		}
+		handleNext();
+	};
+
+	const handleActivityNext = () => {
+		// Avança para próxima etapa após enviar atividade
+		handleNext();
+	};
+
+	// Verifica se a etapa atual é uma atividade
+	const currentActivity = activities.find((a) => a.id === currentQuestion);
+	const isActivityStep = !!currentActivity;
+
 	// Busca a pergunta atual (por enquanto usa mock)
 	const currentQuestionData =
 		mockQuestions.find((q) => q.id === currentQuestion) || mockQuestions[0];
 
-	// Verifica se deve mostrar feedback ou a pergunta
+	// Verifica se deve mostrar feedback ou a pergunta/atividade
 	const isShowingFeedback = showFeedback[currentQuestion];
+	const isShowingActivityFeedback = currentActivity ? showActivityFeedback[currentActivity.id] : false;
 
 	// Determina a resposta correta (em produção viria de uma API)
 	const correctAnswerId = 'option1'; // Para a primeira pergunta, option1 é a correta
@@ -121,11 +179,11 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		explanation: isCorrect 
 			? 'Usar as redes sociais ajuda seu negócio a alcançar mais pessoas e pode aumentar suas vendas.'
 			: 'Divulgar seu negócio nas redes sociais é importante porque ajuda você a alcançar mais pessoas sem gastar muito.',
-		//video: {
-			//thumbnail: 'https://via.placeholder.com/400x225/6B46C1/FFFFFF?text=Video+Thumbnail',
-			//url: 'https://example.com/video.mp4',
-			//title: 'Vídeo sobre redes sociais',
-		//},
+		video: {
+			thumbnail: 'https://via.placeholder.com/400x225/6B46C1/FFFFFF?text=Video+Thumbnail',
+			url: 'https://example.com/video.mp4',
+			title: 'Vídeo sobre redes sociais',
+		},
 	};
 
 	return (
@@ -140,8 +198,31 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 					feedbackExplanation={feedbackData.explanation}
 					isCorrect={isCorrect}
 					correctAnswerId={correctAnswerId}
-					video={undefined}
+					video={feedbackData.video}
 					onNext={handleNextFromFeedback}
+				/>
+			) : isShowingActivityFeedback && currentActivity ? (
+				<QuizActivityFeedbackStep
+					currentQuestion={currentQuestion}
+					totalQuestions={totalQuestions}
+					activityTitle={currentActivity.activityTitle}
+					activityDescription={currentActivity.activityDescription}
+					feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
+					submittedFiles={activityFiles[currentActivity.id] || []}
+					video={currentActivity.video}
+					onNext={handleActivityFeedbackNext}
+				/>
+			) : isActivityStep && currentActivity ? (
+				<QuizActivityStep
+					currentQuestion={currentQuestion}
+					totalQuestions={totalQuestions}
+					activityTitle={currentActivity.activityTitle}
+					activityDescription={currentActivity.activityDescription}
+					suggestionLabel={currentActivity.suggestionLabel}
+					downloadButtonText={currentActivity.downloadButtonText}
+					downloadUrl={currentActivity.downloadUrl}
+					onSubmit={handleActivitySubmit}
+					onNext={handleActivityNext}
 				/>
 			) : (
 				<QuizQuestionStep

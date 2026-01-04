@@ -1,10 +1,12 @@
 'use client';
 
 import { FunctionComponent, useState } from 'react';
-import { QuizProps, QuizQuestion, QuizAnswer } from './Quiz.interface';
+import { QuizProps, QuizQuestion, QuizActivity, QuizAnswer } from './Quiz.interface';
 import { QuizQuestionStep } from './components/QuizQuestionStep';
 import { QuizSubjectiveQuestionStep } from './components/QuizSubjectiveQuestionStep';
 import { QuizFeedbackStep } from './components/QuizFeedbackStep';
+import { QuizActivityStep } from './components/QuizActivityStep';
+import { QuizActivityFeedbackStep } from './components/QuizActivityFeedbackStep';
 import { QuizSubjectiveFeedbackStep } from './components/QuizSubjectiveFeedbackStep';
 import { QuizCompletionStep } from './components/QuizCompletionStep';
 
@@ -66,7 +68,9 @@ const mockQuestions: QuizQuestion[] = [
 export const Quiz: FunctionComponent<QuizProps> = ({
 	totalQuestions: externalTotalQuestions,
 	currentQuestion: initialQuestion = 1,
+	activities = [],
 	onAnswerSelect: externalOnAnswerSelect,
+	onActivitySubmit: externalOnActivitySubmit,
 	onNext,
 	onPrevious,
 }) => {
@@ -84,6 +88,15 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	}>({});
 	const [showFeedback, setShowFeedback] = useState<{
 		[questionId: number]: boolean;
+	}>({});
+	const [submittedActivities, setSubmittedActivities] = useState<{
+		[activityId: number]: boolean;
+	}>({});
+	const [activityFiles, setActivityFiles] = useState<{
+		[activityId: number]: File[];
+	}>({});
+	const [showActivityFeedback, setShowActivityFeedback] = useState<{
+		[activityId: number]: boolean;
 	}>({});
 	const [showCompletion, setShowCompletion] = useState(false);
 
@@ -184,6 +197,50 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		setShowCompletion(true);
 	};
 
+	const handleActivitySubmit = (files: File[]) => {
+		// Busca a atividade atual
+		const currentActivity = activities.find((a) => a.id === currentQuestion);
+		if (currentActivity) {
+			setSubmittedActivities((prev) => ({
+				...prev,
+				[currentActivity.id]: true,
+			}));
+			setActivityFiles((prev) => ({
+				...prev,
+				[currentActivity.id]: files,
+			}));
+			setShowActivityFeedback((prev) => ({
+				...prev,
+				[currentActivity.id]: true,
+			}));
+
+			if (externalOnActivitySubmit) {
+				externalOnActivitySubmit(currentActivity.id, files);
+			}
+		}
+	};
+
+	const handleActivityFeedbackNext = () => {
+		// Limpa o feedback e vai para a próxima etapa
+		const currentActivity = activities.find((a) => a.id === currentQuestion);
+		if (currentActivity) {
+			setShowActivityFeedback((prev) => ({
+				...prev,
+				[currentActivity.id]: false,
+			}));
+		}
+		handleNext();
+	};
+
+	const handleActivityNext = () => {
+		// Avança para próxima etapa após enviar atividade
+		handleNext();
+	};
+
+	// Verifica se a etapa atual é uma atividade
+	const currentActivity = activities.find((a) => a.id === currentQuestion);
+	const isActivityStep = !!currentActivity;
+
 	// Busca a pergunta atual (por enquanto usa mock)
 	// Usa o índice do array (currentQuestion - 1) para garantir que sempre encontre a pergunta correta
 	// Valida se o índice está dentro do range do array
@@ -193,8 +250,10 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 			? mockQuestions[questionIndex] 
 			: mockQuestions[0];
 
+	// Verifica se deve mostrar feedback ou a pergunta/atividade
+	const isShowingFeedback = showFeedback[currentQuestion];
+	const isShowingActivityFeedback = currentActivity ? showActivityFeedback[currentActivity.id] : false;
 	// Verifica se deve mostrar feedback ou a pergunta
-	const isShowingFeedback = showFeedback[currentQuestion] || false;
 
 	// Verifica se é pergunta subjetiva (só se tiver currentQuestionData)
 	const isSubjective = currentQuestionData?.type === 'subjective' || false;
@@ -226,6 +285,57 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		points: 0,
 		explanation: '',
 	};
+
+	return (
+		<div className='w-full'>
+			{isShowingFeedback ? (
+				<QuizFeedbackStep
+					question={currentQuestionData}
+					currentQuestion={currentQuestion}
+					totalQuestions={totalQuestions}
+					selectedAnswerId={selectedAnswers[currentQuestion]}
+					points={feedbackData.points}
+					feedbackExplanation={feedbackData.explanation}
+					isCorrect={isCorrect}
+					correctAnswerId={correctAnswerId}
+					video={feedbackData.video}
+					onNext={handleNextFromFeedback}
+				/>
+			) : isShowingActivityFeedback && currentActivity ? (
+				<QuizActivityFeedbackStep
+					currentQuestion={currentQuestion}
+					totalQuestions={totalQuestions}
+					activityTitle={currentActivity.activityTitle}
+					activityDescription={currentActivity.activityDescription}
+					feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
+					submittedFiles={activityFiles[currentActivity.id] || []}
+					video={currentActivity.video}
+					onNext={handleActivityFeedbackNext}
+				/>
+			) : isActivityStep && currentActivity ? (
+				<QuizActivityStep
+					currentQuestion={currentQuestion}
+					totalQuestions={totalQuestions}
+					activityTitle={currentActivity.activityTitle}
+					activityDescription={currentActivity.activityDescription}
+					suggestionLabel={currentActivity.suggestionLabel}
+					downloadButtonText={currentActivity.downloadButtonText}
+					downloadUrl={currentActivity.downloadUrl}
+					onSubmit={handleActivitySubmit}
+					onNext={handleActivityNext}
+				/>
+			) : (
+				<QuizQuestionStep
+					question={currentQuestionData}
+					currentQuestion={currentQuestion}
+					totalQuestions={totalQuestions}
+					selectedAnswer={selectedAnswers[currentQuestion]}
+					onAnswerSelect={handleAnswerSelect}
+					onConfirmAnswer={handleConfirmAnswer}
+				/>
+			)}
+		</div>
+	);
 
 	// Feedback específico para perguntas subjetivas
 	const subjectiveFeedbackData = {

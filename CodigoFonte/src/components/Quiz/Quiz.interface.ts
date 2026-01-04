@@ -29,10 +29,22 @@ export interface QuizAnswer {
 	correctAnswerId?: string; // Para questões objetivas quando errou
 }
 
+export interface QuizActivity {
+	id: number;
+	activityTitle: string;
+	activityDescription: string;
+	suggestionLabel?: string;
+	downloadButtonText?: string;
+	downloadUrl?: string;
+	video?: QuizVideo; // Vídeo opcional para o feedback
+}
+
 export interface QuizProps {
 	totalQuestions?: number;
 	currentQuestion?: number;
+	activities?: QuizActivity[]; // Array de atividades (etapas com upload)
 	onAnswerSelect?: (questionId: number, optionId: string) => void;
+	onActivitySubmit?: (activityId: number, files: File[]) => void;
 	onAnswerSubmit?: (questionId: number, answer: string) => void; // Para respostas subjetivas
 	onNext?: () => void;
 	onPrevious?: () => void;

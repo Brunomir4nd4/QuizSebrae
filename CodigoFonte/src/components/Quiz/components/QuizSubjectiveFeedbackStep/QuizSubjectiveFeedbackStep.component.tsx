@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { QuizQuestion, QuizVideo } from '../../Quiz.interface';
 import { ArrowRight, Play, SpeakerHigh } from 'phosphor-react';
 
@@ -25,7 +25,13 @@ export const QuizSubjectiveFeedbackStep: FunctionComponent<QuizSubjectiveFeedbac
 	video,
 	onNext,
 }) => {
+	const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 	const [showTranscript, setShowTranscript] = useState(false);
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	return (
 		<div className='w-full'>
@@ -92,11 +98,11 @@ export const QuizSubjectiveFeedbackStep: FunctionComponent<QuizSubjectiveFeedbac
 									</p>
 								</div>
 							)}
-							{audioBlobs.length > 0 && (
+							{audioBlobs.length > 0 && isMounted && (
 								<div className={userAnswer ? 'mt-5 pt-5 border-t border-[#1EFF9D]' : ''}>
 									<div className='space-y-3'>
 										{audioBlobs.map((audioBlob, index) => (
-											<audio key={index} controls className='w-full'>
+											<audio key={index} controls className='w-full invert contrast-125'>
 												<source src={URL.createObjectURL(audioBlob)} type='audio/wav' />
 												Seu navegador não suporta o elemento de áudio.
 											</audio>
@@ -116,48 +122,66 @@ export const QuizSubjectiveFeedbackStep: FunctionComponent<QuizSubjectiveFeedbac
 						</p>
 					</div>
 
-				{video && (
-					<div className='flex flex-col lg:w-[300px] xl:w-[350px] flex-shrink-0'>
-						<div className='bg-[#6B46C1] rounded-2xl overflow-hidden relative w-full mb-3' style={{ aspectRatio: '16/9' }}>
-							{video.thumbnail ? (
-								<div className='relative w-full h-full'>
-									<img
-										src={video.thumbnail}
-										alt={video.title || 'Vídeo'}
-										className='w-full h-full object-cover'
-									/>
-									<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-20'>
-										<button className='bg-white bg-opacity-90 rounded-full p-3 md:p-4 hover:scale-110 transition-transform shadow-lg'>
-											<Play size={28} weight='fill' color='#6B46C1' className='md:w-8 md:h-8 ml-1' />
+					{video && (
+						<div className='flex flex-col lg:w-[300px] xl:w-[350px] flex-shrink-0'>
+							<div className='bg-[#6B46C1] rounded-2xl overflow-hidden relative w-full mb-3' style={{ aspectRatio: '3/4', height: 'auto' }}>
+								{!isVideoPlaying ? (
+									<>
+										{video.thumbnail ? (
+											<img
+												src={video.thumbnail}
+												alt={video.title || 'Vídeo'}
+												className='w-full h-full object-cover'
+											/>
+										) : (
+											<div className='w-full h-full bg-[#6B46C1]'></div>
+										)}
+										{/* Botão de play preto centralizado */}
+										<button
+											type='button'
+											onClick={() => setIsVideoPlaying(true)}
+											className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-40 transition-all'>
+											<div className='w-20 h-20 md:w-24 md:h-24 rounded-full bg-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform'>
+												<Play size={40} weight='fill' color='#6B46C1' className='ml-1' />
+											</div>
 										</button>
-									</div>
-								</div>
-							) : (
-								<div className='w-full h-full flex items-center justify-center bg-gradient-to-br from-[#6B46C1] to-[#4C1D95]'>
-									<button className='bg-white bg-opacity-90 rounded-full p-3 md:p-4 hover:scale-110 transition-transform shadow-lg'>
-										<Play size={28} weight='fill' color='#6B46C1' className='md:w-8 md:h-8 ml-1' />
+										{/* Banner com frase na parte inferior */}
+										<div className='absolute bottom-0 left-0 right-0 bg-[#6B46C1] px-4 py-4 md:py-5 flex items-center justify-center'>
+											<button
+												type='button'
+												onClick={() => setIsVideoPlaying(true)}
+												className='text-white font-bold text-sm md:text-base hover:opacity-90 transition-opacity'>
+												Quer ver um vídeo sobre isso?
+											</button>
+										</div>
+									</>
+								) : (
+									<video
+										controls
+										autoPlay
+										className='w-full h-full'
+										src={video.url}>
+										Seu navegador não suporta o elemento de vídeo.
+									</video>
+								)}
+							</div>
+							{!isVideoPlaying && (
+								<>
+									<button
+										onClick={() => setShowTranscript(!showTranscript)}
+										className='text-sm md:text-base text-[#6B46C1] font-regular hover:underline text-center'>
+										Ver transcrição
 									</button>
-								</div>
+									{showTranscript && video.transcript && (
+										<div className='mt-3 p-4 bg-white rounded-lg border border-[#D0D1D4]'>
+											<p className='text-sm text-[#6E707A] leading-relaxed'>{video.transcript}</p>
+										</div>
+									)}
+								</>
 							)}
 						</div>
-						<button
-							type='button'
-							className='text-sm md:text-base text-[#6B46C1] font-regular hover:underline text-center mb-2'>
-							Quer ver um vídeo sobre isso?
-						</button>
-						<button
-							onClick={() => setShowTranscript(!showTranscript)}
-							className='text-sm md:text-base text-[#6B46C1] font-regular hover:underline text-center'>
-							Ver transcrição
-						</button>
-						{showTranscript && video.transcript && (
-							<div className='mt-3 p-4 bg-white rounded-lg border border-[#D0D1D4]'>
-								<p className='text-sm text-[#6E707A] leading-relaxed'>{video.transcript}</p>
-							</div>
-						)}
-					</div>
-				)}
-			</div>
+					)}
+				</div>
 
 				<div className='flex justify-center mt-6 md:mt-8 w-full'>
 					<button

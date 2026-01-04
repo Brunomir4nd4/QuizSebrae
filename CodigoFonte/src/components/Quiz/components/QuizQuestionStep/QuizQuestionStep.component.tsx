@@ -65,7 +65,7 @@ export const QuizQuestionStep: FunctionComponent<QuizQuestionStepProps> = ({
 				</div>
 			</div>
 
-			<div className='bg-gradient-to-b from-[#1EFF9D] to-[#14E48A] rounded-2xl p-4 md:p-5 lg:p-6 xl:p-8'>
+			<div className='bg-gradient-to-b from-[#06EBBD] to-[#1EFF9D] rounded-2xl p-4 md:p-5 lg:p-6 xl:p-8'>
 				<div className='flex items-start gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-6 lg:mb-8'>
 					<div className='flex-shrink-0 mt-0.5 md:mt-1'>
 						<svg

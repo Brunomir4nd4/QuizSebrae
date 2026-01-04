@@ -162,7 +162,7 @@ export const QuizActivityFeedbackStep: FunctionComponent<QuizActivityFeedbackSte
 
 						{/* Caixa verde com informações - Centralizada */}
 						<div className='lg:w-64 xl:w-72 flex-shrink-0 mx-auto lg:mx-0'>
-							<div className='bg-gradient-to-br from-[#1EFF9D] to-[#1EFF9D] rounded-2xl p-3 md:p-4 pt-4 md:pt-5 pb-8 md:pb-10 flex flex-col'>
+							<div className='bg-gradient-to-br from-[#06EBBD] to-[#1EFF9D] rounded-2xl p-3 md:p-4 pt-4 md:pt-5 pb-8 md:pb-10 flex flex-col'>
 								{/* Ícone de alto-falante */}
 								<div className='flex justify-center mb-3'>
 									<div className='w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#0A1128] flex items-center justify-center'>
@@ -180,15 +180,17 @@ export const QuizActivityFeedbackStep: FunctionComponent<QuizActivityFeedbackSte
 
 					{video && (
 							<div className='flex flex-col items-end lg:w-[300px] xl:w-[350px] flex-shrink-0 lg:ml-8 xl:ml-12 -mt-12 md:-mt-14 lg:-mt-16'>
-								<div className='bg-[#8156FF] rounded-t-2xl overflow-hidden relative w-full' style={{ aspectRatio: '3/4', height: 'auto' }}>
+								<div className='bg-[#8156FF] rounded-2xl overflow-hidden relative w-full' style={{ aspectRatio: '3/4', height: 'auto' }}>
 								{!isVideoPlaying ? (
 									<>
-										{video.thumbnail && (
+										{video.thumbnail ? (
 											<img
 												src={video.thumbnail}
 												alt={video.title || 'Video thumbnail'}
 												className='w-full h-full object-cover'
 											/>
+										) : (
+											<div className='w-full h-full bg-[#8156FF]'></div>
 										)}
 										{/* Botão de play preto centralizado */}
 										<button

@@ -33,6 +33,12 @@ const mockQuestions: QuizQuestion[] = [
 	},
 	{
 		id: 2,
+		question: 'Conte em poucas palavras como você divulga hoje o seu trabalho ou serviço para outras pessoas.',
+		type: 'subjective',
+		instruction: 'Não precisa escrever muito, pode ser só 2 ou 3 frases contando como você faz hoje para que mais pessoas conheçam seu trabalho.',
+	},
+	{
+		id: 3,
 		question: 'Qual é uma vantagem de divulgar seu negócio nas redes sociais?',
 		type: 'multiple-choice',
 		options: [
@@ -51,12 +57,6 @@ const mockQuestions: QuizQuestion[] = [
 		],
 	},
 	{
-		id: 3,
-		question: 'Conte em poucas palavras como você divulga hoje o seu trabalho ou serviço para outras pessoas.',
-		type: 'subjective',
-		instruction: 'Não precisa escrever muito, pode ser só 2 ou 3 frases contando como você faz hoje para que mais pessoas conheçam seu trabalho.',
-	},
-	{
 		id: 4,
 		question: 'Orçamento pessoal: equilibrando receitas e despesas',
 		type: 'subjective',
@@ -72,7 +72,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	onAnswerSelect: externalOnAnswerSelect,
 	onActivitySubmit: externalOnActivitySubmit,
 	onNext,
-	onPrevious,
 }) => {
 	// Usa o tamanho do array de perguntas como totalQuestions padrão
 	const totalQuestions = externalTotalQuestions || mockQuestions.length;
@@ -88,9 +87,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	}>({});
 	const [showFeedback, setShowFeedback] = useState<{
 		[questionId: number]: boolean;
-	}>({});
-	const [submittedActivities, setSubmittedActivities] = useState<{
-		[activityId: number]: boolean;
 	}>({});
 	const [activityFiles, setActivityFiles] = useState<{
 		[activityId: number]: File[];
@@ -121,15 +117,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		}
 	};
 
-	const handlePrevious = () => {
-		if (currentQuestion > 1) {
-			setCurrentQuestion((prev) => prev - 1);
-			if (onPrevious) {
-				onPrevious();
-			}
-		}
-	};
-
 	const handleAnswerChange = (answer: string) => {
 		const questionId = currentQuestion;
 		setSubjectiveAnswers((prev) => ({
@@ -148,16 +135,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 
 	const handleConfirmAnswer = () => {
 		const questionId = currentQuestion;
-		const currentQuestionData = mockQuestions.find((q) => q.id === questionId) || mockQuestions[0];
-		
-		// Para perguntas subjetivas, usa subjectiveAnswers
-		if (currentQuestionData.type === 'subjective') {
-			console.log('Resposta subjetiva confirmada:', subjectiveAnswers[questionId]);
-			// Aqui você pode adicionar lógica para processar a resposta subjetiva
-			// Por exemplo, enviar para API, etc.
-		} else {
-			console.log('Resposta confirmada:', selectedAnswers[questionId]);
-		}
 		
 		// Mostra o feedback para a pergunta atual
 		setShowFeedback((prev) => ({
@@ -192,19 +169,11 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		}
 	};
 
-	// Função temporária para visualizar a tela de conclusão
-	const handleShowCompletion = () => {
-		setShowCompletion(true);
-	};
 
 	const handleActivitySubmit = (files: File[]) => {
 		// Busca a atividade atual
 		const currentActivity = activities.find((a) => a.id === currentQuestion);
 		if (currentActivity) {
-			setSubmittedActivities((prev) => ({
-				...prev,
-				[currentActivity.id]: true,
-			}));
 			setActivityFiles((prev) => ({
 				...prev,
 				[currentActivity.id]: files,
@@ -232,9 +201,8 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		handleNext();
 	};
 
-	const handleActivityNext = () => {
-		// Avança para próxima etapa após enviar atividade
-		handleNext();
+	const handleShowCompletion = () => {
+		setShowCompletion(true);
 	};
 
 	// Verifica se a etapa atual é uma atividade
@@ -276,75 +244,14 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		explanation: isCorrect 
 			? 'Usar as redes sociais ajuda seu negócio a alcançar mais pessoas e pode aumentar suas vendas.'
 			: 'Divulgar seu negócio nas redes sociais é importante porque ajuda você a alcançar mais pessoas sem gastar muito.',
-		// video: {
-		// 	thumbnail: 'https://via.placeholder.com/400x225/6B46C1/FFFFFF?text=Video+Thumbnail',
-		// 	url: 'https://example.com/video.mp4',
-		// 	title: 'Vídeo sobre redes sociais',
-		// },
 	} : {
 		points: 0,
 		explanation: '',
 	};
-
-	return (
-		<div className='w-full'>
-			{isShowingFeedback ? (
-				<QuizFeedbackStep
-					question={currentQuestionData}
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					selectedAnswerId={selectedAnswers[currentQuestion]}
-					points={feedbackData.points}
-					feedbackExplanation={feedbackData.explanation}
-					isCorrect={isCorrect}
-					correctAnswerId={correctAnswerId}
-					video={feedbackData.video}
-					onNext={handleNextFromFeedback}
-				/>
-			) : isShowingActivityFeedback && currentActivity ? (
-				<QuizActivityFeedbackStep
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					activityTitle={currentActivity.activityTitle}
-					activityDescription={currentActivity.activityDescription}
-					feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
-					submittedFiles={activityFiles[currentActivity.id] || []}
-					video={currentActivity.video}
-					onNext={handleActivityFeedbackNext}
-				/>
-			) : isActivityStep && currentActivity ? (
-				<QuizActivityStep
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					activityTitle={currentActivity.activityTitle}
-					activityDescription={currentActivity.activityDescription}
-					suggestionLabel={currentActivity.suggestionLabel}
-					downloadButtonText={currentActivity.downloadButtonText}
-					downloadUrl={currentActivity.downloadUrl}
-					onSubmit={handleActivitySubmit}
-					onNext={handleActivityNext}
-				/>
-			) : (
-				<QuizQuestionStep
-					question={currentQuestionData}
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					selectedAnswer={selectedAnswers[currentQuestion]}
-					onAnswerSelect={handleAnswerSelect}
-					onConfirmAnswer={handleConfirmAnswer}
-				/>
-			)}
-		</div>
-	);
-
+	
 	// Feedback específico para perguntas subjetivas
 	const subjectiveFeedbackData = {
 		explanation: 'Divulgar seu trabalho é importante para mais pessoas conhecerem o que você faz. Continue divulgando seu trabalho e/ou serviço para outras pessoas nas suas redes sociais.',
-		// video: {
-		// 	thumbnail: 'https://via.placeholder.com/400x225/6B46C1/FFFFFF?text=Video+Thumbnail',
-		// 	url: 'https://example.com/video.mp4',
-		// 	title: 'Vídeo sobre divulgação',
-		// },
 	};
 
 	const selectedAnswerId = selectedAnswers[currentQuestion] || '';
@@ -414,12 +321,11 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	try {
 		return (
 			<div className='w-full max-w-full overflow-x-hidden box-border'>
-				{/* Botão temporário para visualizar tela de conclusão - remover em produção */}
 				<div className='mb-4 flex justify-end'>
 					<button
 						onClick={handleShowCompletion}
 						className='bg-[#FF6F61] hover:bg-[#FF5A4A] text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors'>
-						[DEV] Ver Tela Final
+						Ver Tela Final
 					</button>
 				</div>
 				{isShowingFeedback ? (
@@ -452,17 +358,39 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 							<p className='text-[#6E707A]'>Erro ao carregar feedback. Por favor, tente novamente.</p>
 						</div>
 					)
+				) : isShowingActivityFeedback && currentActivity ? (
+					<QuizActivityFeedbackStep
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						activityTitle={currentActivity.activityTitle}
+						activityDescription={currentActivity.activityDescription}
+						feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
+						submittedFiles={activityFiles[currentActivity.id] || []}
+						video={currentActivity.video}
+						onNext={handleActivityFeedbackNext}
+					/>
+				) : isActivityStep && currentActivity ? (
+					<QuizActivityStep
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						activityTitle={currentActivity.activityTitle}
+						activityDescription={currentActivity.activityDescription}
+						suggestionLabel={currentActivity.suggestionLabel}
+						downloadButtonText={currentActivity.downloadButtonText}
+						downloadUrl={currentActivity.downloadUrl}
+						onSubmit={handleActivitySubmit}
+					/>
 				) : isSubjective ? (
-				<QuizSubjectiveQuestionStep
-					question={currentQuestionData}
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					answer={subjectiveAnswers[currentQuestion]}
-					audioBlobs={subjectiveAudios[currentQuestion] || []}
-					onAnswerChange={handleAnswerChange}
-					onAudioChange={handleAudioChange}
-					onConfirmAnswer={handleConfirmAnswer}
-				/>
+					<QuizSubjectiveQuestionStep
+						question={currentQuestionData}
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						answer={subjectiveAnswers[currentQuestion]}
+						audioBlobs={subjectiveAudios[currentQuestion] || []}
+						onAnswerChange={handleAnswerChange}
+						onAudioChange={handleAudioChange}
+						onConfirmAnswer={handleConfirmAnswer}
+					/>
 				) : currentQuestionData.options && currentQuestionData.options.length > 0 ? (
 					<QuizQuestionStep
 						question={currentQuestionData}

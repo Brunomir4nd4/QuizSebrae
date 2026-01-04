@@ -165,7 +165,7 @@ export const QuizCompletionStep: FunctionComponent<QuizCompletionStepProps> = ({
 
 				{/* Barra lateral - Informações de retorno */}
 				<div className='lg:w-80 lg:flex-shrink-0'>
-					<div className='bg-gradient-to-b from-[#1EFF9D] to-[#14E48A] rounded-2xl p-5 md:p-6 lg:p-8 sticky top-6'>
+					<div className='bg-gradient-to-b from-[#06EBBD] to-[#1EFF9D] rounded-2xl p-5 md:p-6 lg:p-8 sticky top-6'>
 						<h4 className='text-xl md:text-2xl text-[#070D26] font-bold mb-4'>
 							Retorno em breve!
 						</h4>

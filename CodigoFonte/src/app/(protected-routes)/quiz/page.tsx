@@ -5,13 +5,10 @@ import { Quiz } from '@/components/Quiz';
 import { QuizActivity } from '@/components/Quiz/Quiz.interface';
 
 const QuizPage: FunctionComponent = () => {
-	// Título do quiz baseado no encontro (pode vir de configuração)
-	const quizTitle = 'Quiz Encontro 03';
-
-	// Exemplo de atividade para a etapa 2
+	// Exemplo de atividade para a etapa 3
 	const activities: QuizActivity[] = [
 		{
-			id: 2, // ID deve corresponder ao número da etapa
+			id: 3, // ID deve corresponder ao número da etapa
 			activityTitle: 'Orçamento pessoal: equilibrando receitas e despesas',
 			activityDescription:
 				'Invista um tempo na elaboração do seu fluxo de receitas e despesas pessoais. Você pode usar uma planilha no computador, um caderno ou mesmo um aplicativo dedicado a isso. A forma pouco importa, o fundamental é que você faça, ajuste, aprimore e não desista!',
@@ -29,13 +26,6 @@ const QuizPage: FunctionComponent = () => {
 
 	const handleActivitySubmit = (activityId: number, files: File[]) => {
 		console.log('Arquivos enviados para atividade:', activityId, files);
-		// Aqui você pode fazer upload dos arquivos para a API
-		// Exemplo:
-		// const formData = new FormData();
-		// files.forEach((file) => {
-		//   formData.append('files', file);
-		// });
-		// await uploadActivityFiles(activityId, formData);
 	};
 
 	return (
@@ -44,8 +34,9 @@ const QuizPage: FunctionComponent = () => {
 				{/* Componente do Quiz */}
 				{/* 
 					Etapa 1: Pergunta (automática quando currentQuestion=1)
-					Etapa 2: Atividade com upload (quando currentQuestion=2 e activities contém id=2)
-					Etapa 3+: Mais perguntas (automáticas)
+					Etapa 2: Pergunta (automática quando currentQuestion=2)
+					Etapa 3: Atividade com upload (quando currentQuestion=3 e activities contém id=3)
+					Etapa 4+: Mais perguntas (automáticas)
 				*/}
 				<Quiz
 					totalQuestions={5}

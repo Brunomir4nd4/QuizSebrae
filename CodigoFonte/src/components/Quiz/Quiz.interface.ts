@@ -45,8 +45,6 @@ export interface QuizProps {
 	activities?: QuizActivity[]; // Array de atividades (etapas com upload)
 	onAnswerSelect?: (questionId: number, optionId: string) => void;
 	onActivitySubmit?: (activityId: number, files: File[]) => void;
-	onAnswerSubmit?: (questionId: number, answer: string) => void; // Para respostas subjetivas
 	onNext?: () => void;
-	onPrevious?: () => void;
 }
 

@@ -13,13 +13,12 @@ interface QuizActivityStepProps {
 	downloadButtonText?: string;
 	downloadUrl?: string;
 	onSubmit?: (files: File[]) => void;
-	onNext?: () => void;
 }
 
 /**
  * **QuizActivityStep**
  *
- * Componente que exibe uma atividade com upload de arquivos (Etapa 2 do wizard).
+ * Componente que exibe uma atividade com upload de arquivos (Etapa 3 do wizard).
  * Mostra indicador de progresso, descrição da atividade, botão de download e área de upload.
  * Adapta-se para desktop e mobile com diferentes interfaces de upload.
  *
@@ -34,7 +33,6 @@ export const QuizActivityStep: FunctionComponent<QuizActivityStepProps> = ({
 	downloadButtonText,
 	downloadUrl,
 	onSubmit,
-	onNext,
 }) => {
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,8 +68,6 @@ export const QuizActivityStep: FunctionComponent<QuizActivityStepProps> = ({
 		if (selectedFiles.length > 0 && onSubmit) {
 			onSubmit(selectedFiles);
 		}
-		// Não chama onNext aqui - o feedback será mostrado primeiro
-		// O onNext será chamado quando o usuário clicar em "Próxima pergunta" no feedback
 	};
 
 	const handleRemoveFile = (index: number) => {
@@ -126,7 +122,7 @@ export const QuizActivityStep: FunctionComponent<QuizActivityStepProps> = ({
 			</div>
 
 			{/* Seção Completa da Atividade (Fundo Verde) - Tudo dentro do mesmo bloco */}
-			<div className='bg-gradient-to-b from-[#1EFF9D] to-[#14E48A] rounded-2xl p-4 md:p-5 lg:p-6 xl:p-8'>
+			<div className='bg-gradient-to-b from-[#06EBBD] to-[#1EFF9D] rounded-2xl p-4 md:p-5 lg:p-6 xl:p-8'>
 				{/* Cabeçalho com ícone de áudio e título - Centralizado */}
 				<div className='flex items-center justify-center gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-6'>
 					{/* Ícone de áudio com fundo circular escuro */}

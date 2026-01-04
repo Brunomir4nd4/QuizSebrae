@@ -162,7 +162,7 @@ export const QuizActivityFeedbackStep: FunctionComponent<QuizActivityFeedbackSte
 
 						{/* Caixa verde com informações - Centralizada */}
 						<div className='lg:w-64 xl:w-72 flex-shrink-0 mx-auto lg:mx-0'>
-							<div className='bg-gradient-to-br from-[#1EFF9D] to-[#1EFF9D] rounded-2xl p-3 md:p-4 pt-4 md:pt-5 pb-8 md:pb-10 flex flex-col'>
+							<div className='bg-gradient-to-br from-[#06EBBD] to-[#1EFF9D] rounded-2xl p-3 md:p-4 pt-4 md:pt-5 pb-8 md:pb-10 flex flex-col'>
 								{/* Ícone de alto-falante */}
 								<div className='flex justify-center mb-3'>
 									<div className='w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#0A1128] flex items-center justify-center'>

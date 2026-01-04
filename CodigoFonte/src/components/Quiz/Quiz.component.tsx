@@ -1,7 +1,7 @@
 'use client';
 
 import { FunctionComponent, useState } from 'react';
-import { QuizProps, QuizQuestion, QuizActivity } from './Quiz.interface';
+import { QuizProps, QuizQuestion, QuizActivity, QuizAnswer as QuizAnswerInterface } from './Quiz.interface';
 import { QuizQuestionStep } from './components/QuizQuestionStep';
 import { QuizSubjectiveQuestionStep } from './components/QuizSubjectiveQuestionStep';
 import { QuizFeedbackStep } from './components/QuizFeedbackStep';
@@ -34,6 +34,12 @@ const mockQuestions: QuizQuestion[] = [
 	},
 	{
 		id: 2,
+		question: 'Conte em poucas palavras como você divulga hoje o seu trabalho ou serviço para outras pessoas.',
+		type: 'subjective',
+		instruction: 'Não precisa escrever muito, pode ser só 2 ou 3 frases contando como você faz hoje para que mais pessoas conheçam seu trabalho.',
+	},
+	{
+		id: 3,
 		question: 'Qual é uma vantagem de divulgar seu negócio nas redes sociais?',
 		type: 'multiple-choice',
 		options: [
@@ -52,12 +58,6 @@ const mockQuestions: QuizQuestion[] = [
 		],
 	},
 	{
-		id: 3,
-		question: 'Conte em poucas palavras como você divulga hoje o seu trabalho ou serviço para outras pessoas.',
-		type: 'subjective',
-		instruction: 'Não precisa escrever muito, pode ser só 2 ou 3 frases contando como você faz hoje para que mais pessoas conheçam seu trabalho.',
-	},
-	{
 		id: 4,
 		question: 'Orçamento pessoal: equilibrando receitas e despesas',
 		type: 'subjective',
@@ -73,7 +73,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	onAnswerSelect: externalOnAnswerSelect,
 	onActivitySubmit: externalOnActivitySubmit,
 	onNext,
-	onPrevious,
 }) => {
 	// Usa o tamanho do array de perguntas como totalQuestions padrão
 	const totalQuestions = externalTotalQuestions || mockQuestions.length;
@@ -89,9 +88,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	}>({});
 	const [showFeedback, setShowFeedback] = useState<{
 		[questionId: number]: boolean;
-	}>({});
-	const [submittedActivities, setSubmittedActivities] = useState<{
-		[activityId: number]: boolean;
 	}>({});
 	const [activityFiles, setActivityFiles] = useState<{
 		[activityId: number]: File[];
@@ -124,15 +120,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		}
 	};
 
-	const handlePrevious = () => {
-		if (currentQuestion > 1) {
-			setCurrentQuestion((prev) => prev - 1);
-			if (onPrevious) {
-				onPrevious();
-			}
-		}
-	};
-
 	const handleAnswerChange = (answer: string) => {
 		const questionId = currentQuestion;
 		setSubjectiveAnswers((prev) => ({
@@ -151,16 +138,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 
 	const handleConfirmAnswer = () => {
 		const questionId = currentQuestion;
-		const currentQuestionData = mockQuestions.find((q) => q.id === questionId) || mockQuestions[0];
-		
-		// Para perguntas subjetivas, usa subjectiveAnswers
-		if (currentQuestionData.type === 'subjective') {
-			console.log('Resposta subjetiva confirmada:', subjectiveAnswers[questionId]);
-			// Aqui você pode adicionar lógica para processar a resposta subjetiva
-			// Por exemplo, enviar para API, etc.
-		} else {
-			console.log('Resposta confirmada:', selectedAnswers[questionId]);
-		}
 		
 		// Mostra o feedback para a pergunta atual
 		setShowFeedback((prev) => ({
@@ -194,20 +171,11 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 			console.error('Erro ao navegar para próxima pergunta:', error);
 		}
 	};
-		
-	// Função temporária para visualizar a tela de conclusão
-	const handleShowCompletion = () => {
-		setShowCompletion(true);
-	};
 
 	const handleActivitySubmit = (files: File[]) => {
 		// Busca a atividade atual
 		const currentActivity = activities.find((a) => a.id === currentQuestion);
 		if (currentActivity) {
-			setSubmittedActivities((prev) => ({
-				...prev,
-				[currentActivity.id]: true,
-			}));
 			setActivityFiles((prev) => ({
 				...prev,
 				[currentActivity.id]: files,
@@ -241,7 +209,7 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 				const activity = activities.find((a) => a.id === questionNum);
 				if (activity) {
 					// Para atividades, verifica se foram enviados arquivos
-					return submittedActivities[activity.id] && (activityFiles[activity.id]?.length || 0) > 0;
+					return (activityFiles[activity.id]?.length || 0) > 0;
 				} else {
 					// Para perguntas, verifica se foi selecionada uma resposta
 					return !!selectedAnswers[questionNum];
@@ -255,7 +223,7 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 				for (let i = 1; i <= totalQuestions; i++) {
 					const activity = activities.find((a) => a.id === i);
 					if (activity) {
-						if (!submittedActivities[activity.id] || (activityFiles[activity.id]?.length || 0) === 0) {
+						if ((activityFiles[activity.id]?.length || 0) === 0) {
 							setCurrentQuestion(i);
 							return;
 						}
@@ -272,9 +240,8 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		}
 	};
 
-	const handleActivityNext = () => {
-		// Avança para próxima etapa após enviar atividade
-		handleNext();
+	const handleShowCompletion = () => {
+		setShowCompletion(true);
 	};
 
 	// Verifica se a etapa atual é uma atividade
@@ -381,57 +348,224 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		return answers;
 	};
 
-	return (
-		<div className='w-full'>
-			{showSuccess ? (
-				<QuizSuccessStep answers={prepareAnswers()} quizTitle='Quiz Encontro 03' />
-			) : isShowingFeedback ? (
-				<QuizFeedbackStep
-					question={currentQuestionData}
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					selectedAnswerId={selectedAnswers[currentQuestion]}
-					points={feedbackData.points}
-					feedbackExplanation={feedbackData.explanation}
-					isCorrect={isCorrect}
-					correctAnswerId={correctAnswerId}
-					video={feedbackData.video}
-					onNext={handleNextFromFeedback}
-				/>
-			) : isShowingActivityFeedback && currentActivity ? (
-				<QuizActivityFeedbackStep
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					activityTitle={currentActivity.activityTitle}
-					activityDescription={currentActivity.activityDescription}
-					feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
-					submittedFiles={activityFiles[currentActivity.id] || []}
-					video={currentActivity.video}
-					onNext={handleActivityFeedbackNext}
-				/>
-			) : isActivityStep && currentActivity ? (
-				<QuizActivityStep
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					activityTitle={currentActivity.activityTitle}
-					activityDescription={currentActivity.activityDescription}
-					suggestionLabel={currentActivity.suggestionLabel}
-					downloadButtonText={currentActivity.downloadButtonText}
-					downloadUrl={currentActivity.downloadUrl}
-					onSubmit={handleActivitySubmit}
-					onNext={handleActivityNext}
-				/>
-			) : (
-				<QuizQuestionStep
-					question={currentQuestionData}
-					currentQuestion={currentQuestion}
-					totalQuestions={totalQuestions}
-					selectedAnswer={selectedAnswers[currentQuestion]}
-					onAnswerSelect={handleAnswerSelect}
-					onConfirmAnswer={handleConfirmAnswer}
-				/>
-			)}
-		</div>
-	);
+	// return (
+	// 	<div className='w-full'>
+	// 		{showSuccess ? (
+	// 			<QuizSuccessStep answers={prepareAnswers()} quizTitle='Quiz Encontro 03' />
+	// 		) : isShowingFeedback ? (
+	// 			<QuizFeedbackStep
+	// 				question={currentQuestionData}
+	// 				currentQuestion={currentQuestion}
+	// 				totalQuestions={totalQuestions}
+	// 				selectedAnswerId={selectedAnswers[currentQuestion]}
+	// 				points={feedbackData.points}
+	// 				feedbackExplanation={feedbackData.explanation}
+	// 				isCorrect={isCorrect}
+	// 				correctAnswerId={correctAnswerId}
+	// 				video={feedbackData.video}
+	// 				onNext={handleNextFromFeedback}
+	// 			/>
+	// 		) : isShowingActivityFeedback && currentActivity ? (
+	// 			<QuizActivityFeedbackStep
+	// 				currentQuestion={currentQuestion}
+	// 				totalQuestions={totalQuestions}
+	// 				activityTitle={currentActivity.activityTitle}
+	// 				activityDescription={currentActivity.activityDescription}
+	// 				feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
+	// 				submittedFiles={activityFiles[currentActivity.id] || []}
+	// 				video={currentActivity.video}
+	// 				onNext={handleActivityFeedbackNext}
+	// 			/>
+	// 		) : isActivityStep && currentActivity ? (
+	// 			<QuizActivityStep
+	// 				currentQuestion={currentQuestion}
+	// 				totalQuestions={totalQuestions}
+	// 				activityTitle={currentActivity.activityTitle}
+	// 				activityDescription={currentActivity.activityDescription}
+	// 				suggestionLabel={currentActivity.suggestionLabel}
+	// 				downloadButtonText={currentActivity.downloadButtonText}
+	// 				downloadUrl={currentActivity.downloadUrl}
+	// 				onSubmit={handleActivitySubmit}
+	// 				onNext={handleActivityNext}
+	// 			/>
+	// 		) : (
+	// 			<QuizQuestionStep
+	// 				question={currentQuestionData}
+	// 				currentQuestion={currentQuestion}
+	// 				totalQuestions={totalQuestions}
+	// 				selectedAnswer={selectedAnswers[currentQuestion]}
+	// 				onAnswerSelect={handleAnswerSelect}
+	// 				onConfirmAnswer={handleConfirmAnswer}
+	// 			/>
+	// 		)}
+	// 	</div>
+	// );
+	
+	// Feedback específico para perguntas subjetivas
+	const subjectiveFeedbackData = {
+		explanation: 'Divulgar seu trabalho é importante para mais pessoas conhecerem o que você faz. Continue divulgando seu trabalho e/ou serviço para outras pessoas nas suas redes sociais.',
+	};
+
+	const selectedAnswerId = selectedAnswers[currentQuestion] || '';
+	const subjectiveAnswer = subjectiveAnswers[currentQuestion] || '';
+
+	// Prepara dados das respostas para a tela de conclusão
+	const prepareCompletionAnswers = (): QuizAnswerInterface[] => {
+		return mockQuestions.map((question, index) => {
+			const questionId = question.id || index + 1;
+			const isSubjective = question.type === 'subjective';
+			
+			if (isSubjective) {
+				// Para questões subjetivas, usa dados reais ou mockados
+				let mockAnswer = '';
+				if (questionId === 3) {
+					mockAnswer = 'Eu mando mensagem no WhatsApp pros meus clientes quando tenho bolo novo e posto Foto no meu Facebook pra mostrar os bolos que faço.';
+				}
+				
+				return {
+					questionId,
+					question,
+					subjectiveAnswer: subjectiveAnswers[questionId] || mockAnswer || 'Resposta de exemplo para questões subjetivas',
+					audioBlobs: subjectiveAudios[questionId] || [],
+				};
+			} else {
+				// Para questões objetivas, simula respostas corretas e incorretas
+				const correctAnswerId = question.options?.[0]?.id || 'option1';
+				let selectedOptionId = selectedAnswers[questionId];
+				
+				// Se não houver resposta selecionada, usa mock: primeira correta, segunda incorreta
+				if (!selectedOptionId) {
+					selectedOptionId = questionId === 1 ? correctAnswerId : 'option2';
+				}
+				
+				const isCorrect = selectedOptionId === correctAnswerId;
+				
+				return {
+					questionId,
+					question,
+					selectedOptionId,
+					isCorrect,
+					correctAnswerId: isCorrect ? undefined : correctAnswerId,
+				};
+			}
+		});
+	};
+
+	// Validação: garantir que temos uma pergunta válida
+	if (!currentQuestionData && !showCompletion) {
+		return (
+			<div className='w-full p-4 text-center'>
+				<p className='text-[#6E707A]'>Pergunta não encontrada.</p>
+			</div>
+		);
+	}
+
+	// Se está na tela de conclusão, mostra ela
+	if (showCompletion) {
+		return (
+			<div className='w-full max-w-full overflow-x-hidden box-border'>
+				<QuizCompletionStep answers={prepareCompletionAnswers()} />
+			</div>
+		);
+	}
+
+	// Renderização com tratamento de erro
+	try {
+		return (
+			<div className='w-full max-w-full overflow-x-hidden box-border'>
+				<div className='mb-4 flex justify-end'>
+					<button
+						onClick={handleShowCompletion}
+						className='bg-[#FF6F61] hover:bg-[#FF5A4A] text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors'>
+						Ver Tela Final
+					</button>
+				</div>
+				{isShowingFeedback ? (
+					isSubjective ? (
+						<QuizSubjectiveFeedbackStep
+							question={currentQuestionData}
+							currentQuestion={currentQuestion}
+							totalQuestions={totalQuestions}
+							userAnswer={subjectiveAnswer}
+							audioBlobs={subjectiveAudios[currentQuestion] || []}
+							feedbackExplanation={subjectiveFeedbackData.explanation}
+							video={undefined}
+							onNext={handleNextFromFeedback}
+						/>
+					) : currentQuestionData.options && currentQuestionData.options.length > 0 ? (
+						<QuizFeedbackStep
+							question={currentQuestionData}
+							currentQuestion={currentQuestion}
+							totalQuestions={totalQuestions}
+							selectedAnswerId={selectedAnswerId}
+							points={feedbackData.points}
+							feedbackExplanation={feedbackData.explanation}
+							isCorrect={isCorrect}
+							correctAnswerId={correctAnswerId}
+							video={undefined}
+							onNext={handleNextFromFeedback}
+						/>
+					) : (
+						<div className='w-full p-4 text-center'>
+							<p className='text-[#6E707A]'>Erro ao carregar feedback. Por favor, tente novamente.</p>
+						</div>
+					)
+				) : isShowingActivityFeedback && currentActivity ? (
+					<QuizActivityFeedbackStep
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						activityTitle={currentActivity.activityTitle}
+						activityDescription={currentActivity.activityDescription}
+						feedbackText='Organizar o que você ganha e o que gasta ajuda a entender melhor seu dinheiro. Assim, você consegue se planejar, evitar dívidas e dar passos mais seguros no seu negócio e na sua vida.'
+						submittedFiles={activityFiles[currentActivity.id] || []}
+						video={currentActivity.video}
+						onNext={handleActivityFeedbackNext}
+					/>
+				) : isActivityStep && currentActivity ? (
+					<QuizActivityStep
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						activityTitle={currentActivity.activityTitle}
+						activityDescription={currentActivity.activityDescription}
+						suggestionLabel={currentActivity.suggestionLabel}
+						downloadButtonText={currentActivity.downloadButtonText}
+						downloadUrl={currentActivity.downloadUrl}
+						onSubmit={handleActivitySubmit}
+					/>
+				) : isSubjective ? (
+					<QuizSubjectiveQuestionStep
+						question={currentQuestionData}
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						answer={subjectiveAnswers[currentQuestion]}
+						audioBlobs={subjectiveAudios[currentQuestion] || []}
+						onAnswerChange={handleAnswerChange}
+						onAudioChange={handleAudioChange}
+						onConfirmAnswer={handleConfirmAnswer}
+					/>
+				) : currentQuestionData.options && currentQuestionData.options.length > 0 ? (
+					<QuizQuestionStep
+						question={currentQuestionData}
+						currentQuestion={currentQuestion}
+						totalQuestions={totalQuestions}
+						selectedAnswer={selectedAnswerId || undefined}
+						onAnswerSelect={handleAnswerSelect}
+						onConfirmAnswer={handleConfirmAnswer}
+					/>
+				) : (
+					<div className='w-full p-4 text-center'>
+						<p className='text-[#6E707A]'>Erro ao carregar pergunta. Por favor, tente novamente.</p>
+					</div>
+				)}
+			</div>
+		);
+	} catch (error) {
+		console.error('Erro ao renderizar quiz:', error);
+		return (
+			<div className='w-full p-4 text-center'>
+				<p className='text-[#FF6F61]'>Ocorreu um erro ao carregar o quiz. Por favor, recarregue a página.</p>
+			</div>
+		);
+	}
 };
 

@@ -2,7 +2,7 @@
 
 import React, { FunctionComponent, useState, useRef, useEffect } from 'react';
 import { QuizQuestion } from '../../Quiz.interface';
-import { ArrowRight, Microphone, MicrophoneSlash, Trash } from 'phosphor-react';
+import { ArrowRight, Microphone, MicrophoneSlash, Trash, SpeakerHigh } from 'phosphor-react';
 import { BaseModal } from '@/components/BaseModal';
 import { ModalButton } from '@/components/AppointmentModal/AppointmentModal.styles';
 import { Divider, Box } from '@mui/material';
@@ -98,6 +98,7 @@ export const QuizSubjectiveQuestionStep: FunctionComponent<QuizSubjectiveQuestio
 		}
 	}, [externalAudioBlobs]);
 
+
 	const handleOpenConfirmModal = (index: number) => {
 		setAudioIndexToRemove(index);
 		setConfirmModalOpen(true);
@@ -120,7 +121,8 @@ export const QuizSubjectiveQuestionStep: FunctionComponent<QuizSubjectiveQuestio
 	};
 	
 	return (
-		<div className='w-full max-w-full overflow-x-hidden box-border'>
+		<>
+			<div className='w-full max-w-full overflow-x-hidden box-border'>
 			<div className='mb-6 md:mb-8'>
 				<div className='flex flex-col md:flex-row md:items-center gap-3 md:gap-0 mb-3 md:mb-4'>
 					<p className='text-base md:text-lg text-[#6E707A] font-regular md:mr-4 flex-shrink-0'>Perguntas</p>
@@ -161,12 +163,12 @@ export const QuizSubjectiveQuestionStep: FunctionComponent<QuizSubjectiveQuestio
 				</div>
 			</div>
 
-			<div className='bg-gradient-to-b from-[#1EFF9D] to-[#14E48A] rounded-2xl p-4 md:p-5 lg:p-6 xl:p-8 max-w-full overflow-x-hidden box-border'>
-				<div className='flex items-start gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-6 lg:mb-8 min-w-0'>
+			<div className='bg-gradient-to-b from-[#06EBBD] to-[#1EFF9D] rounded-2xl p-6 md:p-8 lg:p-10 xl:p-12 max-w-full overflow-x-hidden box-border m-4 md:m-6 lg:m-8 flex flex-col items-center'>
+				<div className='flex items-start gap-2 md:gap-3 lg:gap-4 mb-6 md:mb-8 lg:mb-10 min-w-0 px-2 md:px-4 max-w-xl w-full'>
 					<div className='flex-shrink-0 mt-0.5 md:mt-1'>
-						<svg width='20' height='20' className='md:w-6 md:h-6 flex-shrink-0' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-							<circle cx='12' cy='12' r='8' fill='#070D26' />
-						</svg>
+						<div className='w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#070D26] flex items-center justify-center'>
+							<SpeakerHigh size={14} weight='fill' color='#FFFFFF' className='md:w-5 md:h-5' />
+						</div>
 					</div>
 					<p className='text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl text-[#070D26] font-bold flex-1 leading-tight break-words min-w-0' style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
 						{question.question}
@@ -174,32 +176,32 @@ export const QuizSubjectiveQuestionStep: FunctionComponent<QuizSubjectiveQuestio
 				</div>
 
 				{question.instruction && (
-					<div className='mb-4 md:mb-6'>
+					<div className='mb-6 md:mb-8 px-2 md:px-4 max-w-xl w-full'>
 						<p className='text-sm md:text-base lg:text-lg text-[#070D26] font-regular leading-relaxed break-words' style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
 							{question.instruction}
 						</p>
 					</div>
 				)}
 
-				<div className='mb-4 md:mb-6 max-w-full'>
-					<div className='relative max-w-full box-border'>
+				<div className='mb-6 md:mb-8 max-w-xl w-full px-2 md:px-4'>
+					<div className='relative max-w-full box-border bg-transparent border-2 border-[#070D26]/20 focus-within:border-[#070D26] rounded-xl md:rounded-2xl'>
 						<textarea
 							value={answer || ''}
 							onChange={(e) => onAnswerChange(e.target.value)}
 							placeholder='Escreva sua resposta aqui ou grave um áudio'
 							maxLength={1000}
-							className='w-full min-h-[120px] md:min-h-[150px] lg:min-h-[180px] max-h-[300px] md:max-h-[400px] rounded-xl md:rounded-2xl p-4 md:p-5 lg:p-6 text-sm md:text-base lg:text-lg text-[#070D26] bg-white border-2 border-white focus:border-[#070D26] focus:outline-none resize-none placeholder:text-[#6E707A] overflow-y-auto overflow-x-hidden break-words whitespace-pre-wrap box-border'
-							style={{ wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%', boxSizing: 'border-box' }}
+							className='w-full min-h-[120px] md:min-h-[150px] lg:min-h-[180px] max-h-[300px] md:max-h-[400px] rounded-xl md:rounded-2xl p-6 md:p-8 lg:p-10 pr-16 md:pr-20 lg:pr-24 text-sm md:text-base lg:text-lg text-[#070D26] bg-transparent border-0 focus:border-0 focus:outline-none resize-none placeholder:text-[#070D26]/60 overflow-y-auto overflow-x-hidden break-words whitespace-pre-wrap box-border'
+							style={{ wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%', boxSizing: 'border-box', background: 'transparent' }}
 							rows={6}
 							wrap='soft'
 						/>
-						<button
+						<button	
 							type='button'
 							onClick={handleToggleRecording}
-							className={`absolute bottom-4 right-4 p-3 md:p-4 rounded-full transition-all shadow-lg ${
+							className={`absolute top-6 right-6 md:top-8 md:right-8 p-3 md:p-4 rounded-full transition-all shadow-lg z-10 ${
 								isRecording
 									? 'bg-[#FF6F61] hover:bg-[#FF5A4A] text-white'
-									: 'bg-[#070D26] hover:bg-[#0a1424] text-[#1EFF9D]'
+									: 'bg-[#1EFF9D] hover:bg-[#14E48A] text-[#070D26]'
 							}`}>
 							{isRecording ? (
 								<MicrophoneSlash size={24} weight='fill' className='md:w-6 md:h-6' />
@@ -207,39 +209,40 @@ export const QuizSubjectiveQuestionStep: FunctionComponent<QuizSubjectiveQuestio
 								<Microphone size={24} weight='fill' className='md:w-6 md:h-6' />
 							)}
 						</button>
+
+						{isRecording && (
+							<div className='px-6 md:px-8 lg:px-10 pb-4 md:pb-6 lg:pb-8 flex items-center gap-2'>
+								<div className='w-2 h-2 bg-[#FF6F61] rounded-full animate-pulse'></div>
+								<p className='text-sm text-[#FF6F61] font-regular'>Gravando...</p>
+							</div>
+						)}
+						{audioBlobs.length > 0 && !isRecording && (
+							<div className='px-6 md:px-8 lg:px-10 pb-4 md:pb-6 lg:pb-8 space-y-3'>
+								{audioBlobs.map((audioBlob, index) => (
+									<div key={index} className='p-3 bg-transparent rounded-lg flex items-center gap-3'>
+										<audio controls className='flex-1 invert contrast-125'>
+											<source src={URL.createObjectURL(audioBlob)} type='audio/wav' />
+											Seu navegador não suporta o elemento de áudio.
+										</audio>
+										<button
+											type='button'
+											onClick={() => handleOpenConfirmModal(index)}
+											className='p-3 md:p-4 bg-[#070D26] text-[#FF6F61] hover:text-[#FF5A4A] hover:bg-[#0a1424] transition-colors flex-shrink-0 rounded-full'>
+											<Trash size={20} weight='regular' />
+										</button>
+									</div>
+								))}
+							</div>
+						)}
 					</div>
-					{isRecording && (
-						<div className='mt-2 flex items-center gap-2'>
-							<div className='w-2 h-2 bg-[#FF6F61] rounded-full animate-pulse'></div>
-							<p className='text-sm text-[#FF6F61] font-regular'>Gravando...</p>
-						</div>
-					)}
-					{audioBlobs.length > 0 && !isRecording && (
-						<div className='mt-3 space-y-3'>
-							{audioBlobs.map((audioBlob, index) => (
-								<div key={index} className='p-3 bg-white rounded-lg border-2 border-[#1EFF9D] flex items-center gap-3'>
-									<audio controls className='flex-1'>
-										<source src={URL.createObjectURL(audioBlob)} type='audio/wav' />
-										Seu navegador não suporta o elemento de áudio.
-									</audio>
-									<button
-										type='button'
-										onClick={() => handleOpenConfirmModal(index)}
-										className='p-2 text-[#FF6F61] hover:text-[#FF5A4A] transition-colors flex-shrink-0'>
-										<Trash size={20} weight='regular' />
-									</button>
-								</div>
-							))}
-						</div>
-					)}
 				</div>
 
 				{((answer && answer.trim().length > 0) || audioBlobs.length > 0) && onConfirmAnswer && (
-					<div className='flex justify-center mt-4 md:mt-6'>
+					<div className='flex justify-center mt-6 md:mt-8 px-2 md:px-4'>
 						<button
 							onClick={onConfirmAnswer}
 							className='bg-[#070D26] hover:bg-[#0a1424] text-[#1EFF9D] font-bold px-5 md:px-6 lg:px-8 py-3 md:py-3.5 rounded-full transition-all shadow-md hover:shadow-lg flex items-center gap-3 md:gap-4 text-base md:text-lg w-full md:w-auto justify-center group'>
-							<span>Confirmar Resposta</span>
+							<span>Enviar resposta</span>
 							<div className='bg-[#1EFF9D] rounded-full p-1.5 md:p-2 flex items-center justify-center flex-shrink-0'>
 								<ArrowRight size={16} weight='bold' color='#070D26' className='md:w-5 md:h-5' />
 							</div>
@@ -298,6 +301,7 @@ export const QuizSubjectiveQuestionStep: FunctionComponent<QuizSubjectiveQuestio
 				<Divider />
 			</BaseModal>
 		</div>
+		</>
 	);
 };
 

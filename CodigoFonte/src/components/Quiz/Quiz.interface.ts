@@ -25,6 +25,7 @@ export interface QuizAnswer {
 	selectedOptionId?: string; // Para questões objetivas
 	subjectiveAnswer?: string; // Para questões subjetivas
 	audioBlobs?: Blob[]; // Para questões subjetivas
+	submittedFiles?: File[]; // Para atividades com upload de arquivos
 	isCorrect?: boolean; // Para questões objetivas
 	correctAnswerId?: string; // Para questões objetivas quando errou
 }
@@ -46,5 +47,6 @@ export interface QuizProps {
 	onAnswerSelect?: (questionId: number, optionId: string) => void;
 	onActivitySubmit?: (activityId: number, files: File[]) => void;
 	onNext?: () => void;
+	encounterNumber?: number; // Número do encontro atual
 }
 

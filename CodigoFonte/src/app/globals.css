@@ -66,6 +66,39 @@
   .quiz-submit-button:disabled span {
     color: #1EFF9D !important;
   }
+
+  .quiz-success-card {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    background-image: none !important;
+  }
+
+  .quiz-success-card.bg-white {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    background-image: none !important;
+  }
+
+  /* Força fundo branco e remove qualquer gradiente */
+  div.quiz-success-card,
+  div.quiz-success-card.bg-white,
+  .quiz-success-card[class*="bg-gradient"],
+  .quiz-success-card[class*="from-"],
+  .quiz-success-card[class*="to-"],
+  #quiz-success-card-white {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    background-image: none !important;
+  }
+
+  /* Sobrescreve qualquer gradiente do Tailwind */
+  #quiz-success-card-white.bg-gradient-to-b,
+  #quiz-success-card-white[class*="from-"],
+  #quiz-success-card-white[class*="to-"] {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    background-image: none !important;
+  }
 }
 
 input:focus,
@@ -84,4 +117,26 @@ textarea:focus {
   display: initial !important;
   height: auto !important;
   /* ou display: inline, flex, etc., conforme o que você quiser */
+}
+
+/* Força fundo branco no card de sucesso do quiz - fora do @layer para maior especificidade */
+#quiz-success-card-white {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+}
+
+#quiz-success-card-white.bg-white {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+}
+
+/* Sobrescreve qualquer classe do Tailwind que possa estar aplicando gradiente */
+#quiz-success-card-white[class*="bg-gradient"],
+#quiz-success-card-white[class*="from-"],
+#quiz-success-card-white[class*="to-"] {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { FunctionComponent, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { QuizProps, QuizQuestion, QuizActivity, QuizAnswer as QuizAnswerInterface } from './Quiz.interface';
 import { QuizQuestionStep } from './components/QuizQuestionStep';
 import { QuizSubjectiveQuestionStep } from './components/QuizSubjectiveQuestionStep';
@@ -73,6 +74,7 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	onAnswerSelect: externalOnAnswerSelect,
 	onActivitySubmit: externalOnActivitySubmit,
 	onNext,
+	encounterNumber = 3,
 }) => {
 	// Usa o tamanho do array de perguntas como totalQuestions padrão
 	const totalQuestions = externalTotalQuestions || mockQuestions.length;
@@ -98,6 +100,54 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 
 	const [showCompletion, setShowCompletion] = useState(false);
 	const [showSuccess, setShowSuccess] = useState(false);
+
+	const router = useRouter();
+	const pathname = usePathname();
+
+	// Funções de navegação entre encontros
+	const handlePreviousEncounter = (e?: React.MouseEvent) => {
+		if (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		
+		if (!pathname) return;
+		
+		// Extrai o número do encontro atual do pathname (ex: /quiz/encontro-03 -> 03)
+		const match = pathname.match(/encontro-(\d+)/i);
+		if (match) {
+			const currentEncounter = parseInt(match[1], 10);
+			if (currentEncounter > 1) {
+				const previousEncounter = currentEncounter - 1;
+				const newPath = `/quiz/encontro-${String(previousEncounter).padStart(2, '0')}`;
+				router.push(newPath);
+			}
+		} else {
+			// Se não houver padrão no pathname, navega para encontro anterior assumindo que estamos no encontro 3
+			router.push('/quiz/encontro-02');
+		}
+	};
+
+	const handleNextEncounter = (e?: React.MouseEvent) => {
+		if (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		
+		if (!pathname) return;
+		
+		// Extrai o número do encontro atual do pathname (ex: /quiz/encontro-03 -> 03)
+		const match = pathname.match(/encontro-(\d+)/i);
+		if (match) {
+			const currentEncounter = parseInt(match[1], 10);
+			const nextEncounter = currentEncounter + 1;
+			const newPath = `/quiz/encontro-${String(nextEncounter).padStart(2, '0')}`;
+			router.push(newPath);
+		} else {
+			// Se não houver padrão no pathname, navega para próximo encontro assumindo que estamos no encontro 3
+			router.push('/quiz/encontro-04');
+		}
+	};
 
 	const handleAnswerSelect = (optionId: string) => {
 		const questionId = currentQuestion;
@@ -175,18 +225,33 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	const handleActivitySubmit = (files: File[]) => {
 		// Busca a atividade atual
 		const currentActivity = activities.find((a) => a.id === currentQuestion);
-		if (currentActivity) {
-			setActivityFiles((prev) => ({
-				...prev,
-				[currentActivity.id]: files,
-			}));
+		const currentQuestionData = mockQuestions.find((q) => q.id === currentQuestion);
+		
+		// Verifica se é "Orçamento pessoal" - salva com o ID da questão também
+		const isOrcamentoPessoal = currentQuestionData?.question.includes('Orçamento pessoal');
+		
+		if (currentActivity || isOrcamentoPessoal) {
+			const activityId = currentActivity?.id || currentQuestion;
+			
+			setActivityFiles((prev) => {
+				const newState = {
+					...prev,
+					[activityId]: files,
+				};
+				// Se for "Orçamento pessoal", salva também com o ID da questão
+				if (isOrcamentoPessoal) {
+					newState[currentQuestion] = files;
+				}
+				return newState;
+			});
+			
 			setShowActivityFeedback((prev) => ({
 				...prev,
-				[currentActivity.id]: true,
+				[activityId]: true,
 			}));
 
 			if (externalOnActivitySubmit) {
-				externalOnActivitySubmit(currentActivity.id, files);
+				externalOnActivitySubmit(activityId, files);
 			}
 		}
 	};
@@ -244,6 +309,120 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		setShowCompletion(true);
 	};
 
+	// Prepara as respostas para a tela de sucesso
+	const prepareAnswers = (): QuizAnswer[] => {
+		const answers: QuizAnswer[] = [];
+		
+		// Itera sobre todas as questões
+		for (let i = 1; i <= totalQuestions; i++) {
+			const activity = activities.find((a) => a.id === i);
+			const questionData = mockQuestions.find((q) => q.id === i) || mockQuestions[0];
+			const selectedAnswerId = selectedAnswers[i];
+			
+			// PRIMEIRO: Verifica se é "Orçamento pessoal" - deve ser sempre tratada como atividade
+			if (questionData && questionData.question.includes('Orçamento pessoal')) {
+				// Busca arquivos pelo ID da questão ou pelo ID da atividade correspondente
+				const foundActivity = activities.find((a) => a.id === i || a.id === 3); // Busca por id da questão ou id 3
+				const activityId = foundActivity?.id || 3; // Usa id 3 como padrão se não encontrar
+				
+				// Busca arquivos em todas as chaves possíveis (prioridade: ID da questão, depois ID da atividade, depois id 3)
+				const filesCount = activityFiles[i]?.length || 
+				                  activityFiles[activityId]?.length || 
+				                  activityFiles[3]?.length ||
+				                  activityFiles[4]?.length ||
+				                  (Object.keys(activityFiles).length > 0 ? Object.values(activityFiles)[0]?.length || 0 : 0);
+				console.log('Criando atividade Orçamento pessoal (PRIORIDADE):', { 
+					id: i, 
+					activityId, 
+					foundActivity,
+					activityFilesCount: filesCount, 
+					activityFilesObj: activityFiles,
+					allActivityFiles: Object.entries(activityFiles),
+					filesByKey: {
+						byQuestionId: activityFiles[i]?.length,
+						byActivityId: activityFiles[activityId]?.length,
+						by3: activityFiles[3]?.length,
+						by4: activityFiles[4]?.length
+					}
+				});
+				answers.push({
+					id: i,
+					question: questionData.question,
+					type: 'activity',
+					activityFiles: filesCount,
+				});
+				continue; // Pula para a próxima iteração
+			}
+			
+			if (activity) {
+				// É uma atividade
+				answers.push({
+					id: i,
+					question: activity.activityTitle,
+					type: 'activity',
+					activityFiles: activityFiles[activity.id]?.length || 0,
+				});
+			} else if (questionData) {
+				// É uma pergunta
+				const selectedAnswer = questionData.options?.find((opt) => opt.id === selectedAnswerId);
+				const isCorrectAnswer = selectedAnswerId === questionData.options?.[0]?.id; // Primeira opção é sempre correta (mock)
+				const correctAnswer = questionData.options?.find((opt) => opt.id === questionData.options?.[0]?.id);
+				
+				// Verifica se é pergunta de texto (subjetiva)
+				if (questionData.type === 'subjective') {
+					// Verifica novamente se é "Orçamento pessoal" - não deve ser texto
+					if (questionData.question.includes('Orçamento pessoal')) {
+						// Já foi tratado acima, mas se chegou aqui, trata como atividade
+						const foundActivity = activities.find((a) => a.id === i);
+						const activityId = foundActivity?.id || i;
+						const filesCount = activityFiles[activityId]?.length || 
+						                  activityFiles[i]?.length || 
+						                  activityFiles[3]?.length ||
+						                  activityFiles[4]?.length ||
+						                  (Object.keys(activityFiles).length > 0 ? Object.values(activityFiles).reduce((sum, files) => sum + (files?.length || 0), 0) : 0);
+						console.log('Criando atividade Orçamento pessoal (FALLBACK):', { 
+							id: i, 
+							activityId, 
+							foundActivity,
+							activityFilesCount: filesCount
+						});
+						answers.push({
+							id: i,
+							question: questionData.question,
+							type: 'activity',
+							activityFiles: filesCount,
+						});
+					} else {
+						// É uma resposta de texto subjetiva (não é Orçamento pessoal)
+						answers.push({
+							id: i,
+							question: questionData.question,
+							type: 'text',
+							textAnswer: subjectiveAnswers[i] || '',
+							audioFiles: (subjectiveAudios[i] || []).map((blob, index) => ({
+								url: URL.createObjectURL(blob),
+								duration: '0:30', // Duração mockada
+							})),
+						});
+					}
+				} else {
+					// Pergunta de múltipla escolha
+					answers.push({
+						id: i,
+						question: questionData.question,
+						type: 'multiple-choice',
+						isCorrect: isCorrectAnswer,
+						selectedAnswer: selectedAnswer?.text || '',
+						correctAnswer: !isCorrectAnswer ? correctAnswer?.text : undefined,
+					});
+				}
+			}
+		}
+		
+		return answers;
+	};
+
+
 	// Verifica se a etapa atual é uma atividade
 	const currentActivity = activities.find((a) => a.id === currentQuestion);
 	const isActivityStep = !!currentActivity;
@@ -295,58 +474,6 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 		video: undefined,
 	};
 
-	// Prepara as respostas para a tela de sucesso
-	const prepareAnswers = (): QuizAnswer[] => {
-		const answers: QuizAnswer[] = [];
-		
-		// Itera sobre todas as questões
-		for (let i = 1; i <= totalQuestions; i++) {
-			const activity = activities.find((a) => a.id === i);
-			const questionData = mockQuestions.find((q) => q.id === i) || mockQuestions[0];
-			const selectedAnswerId = selectedAnswers[i];
-			
-			if (activity) {
-				// É uma atividade
-				answers.push({
-					id: i,
-					question: activity.activityTitle,
-					type: 'activity',
-					activityFiles: activityFiles[activity.id]?.length || 0,
-				});
-			} else if (questionData) {
-				// É uma pergunta
-				const selectedAnswer = questionData.options?.find((opt) => opt.id === selectedAnswerId);
-				const isCorrectAnswer = selectedAnswerId === 'option1'; // Mock: option1 é sempre correta
-				const correctAnswer = questionData.options?.find((opt) => opt.id === 'option1');
-				
-				// Verifica se é pergunta de texto (mock: questão 3)
-				if (i === 3) {
-					answers.push({
-						id: i,
-						question: 'Conte em poucas palavras como você divulga hoje o seu trabalho ou serviço para outras pessoas.',
-						type: 'text',
-						textAnswer: 'Eu mando mensagem no WhatsApp pros meus clientes quando tenho bolo novo e posto foto no meu Facebook pra mostrar os bolos que faço.',
-						audioFiles: [
-							{ url: '/audio/audio1.mp3', duration: '0:35' },
-							{ url: '/audio/audio2.mp3', duration: '0:25' },
-						],
-					});
-				} else {
-					// Pergunta de múltipla escolha
-					answers.push({
-						id: i,
-						question: questionData.question,
-						type: 'multiple-choice',
-						isCorrect: isCorrectAnswer,
-						selectedAnswer: selectedAnswer?.text || '',
-						correctAnswer: !isCorrectAnswer ? correctAnswer?.text : undefined,
-					});
-				}
-			}
-		}
-		
-		return answers;
-	};
 
 	// return (
 	// 	<div className='w-full'>
@@ -415,11 +542,29 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 			const questionId = question.id || index + 1;
 			const isSubjective = question.type === 'subjective';
 			
+			// Verifica se é "Orçamento pessoal" - deve incluir arquivos
+			const isOrcamentoPessoal = question.question.includes('Orçamento pessoal');
+			
 			if (isSubjective) {
 				// Para questões subjetivas, usa dados reais ou mockados
 				let mockAnswer = '';
 				if (questionId === 3) {
 					mockAnswer = 'Eu mando mensagem no WhatsApp pros meus clientes quando tenho bolo novo e posto Foto no meu Facebook pra mostrar os bolos que faço.';
+				}
+				
+				// Se for "Orçamento pessoal", inclui os arquivos enviados
+				if (isOrcamentoPessoal) {
+					// Busca arquivos em todas as chaves possíveis (prioridade: ID da questão, depois ID da atividade, depois id 3 ou 4)
+					const files = activityFiles[questionId] || 
+					              activityFiles[3] || 
+					              activityFiles[4] ||
+					              (Object.keys(activityFiles).length > 0 ? Object.values(activityFiles)[0] : []);
+					
+					return {
+						questionId,
+						question,
+						submittedFiles: files || [],
+					};
 				}
 				
 				return {
@@ -464,7 +609,12 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	if (showCompletion) {
 		return (
 			<div className='w-full max-w-full overflow-x-hidden box-border'>
-				<QuizCompletionStep answers={prepareCompletionAnswers()} />
+				<QuizCompletionStep 
+					answers={prepareCompletionAnswers()} 
+					quizTitle='Quiz Encontro 03'
+					onPrevious={handlePreviousEncounter}
+					onNext={handleNextEncounter}
+				/>
 			</div>
 		);
 	}
@@ -473,14 +623,14 @@ export const Quiz: FunctionComponent<QuizProps> = ({
 	try {
 		return (
 			<div className='w-full max-w-full overflow-x-hidden box-border'>
-				<div className='mb-4 flex justify-end'>
-					<button
-						onClick={handleShowCompletion}
-						className='bg-[#FF6F61] hover:bg-[#FF5A4A] text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors'>
-						Ver Tela Final
-					</button>
-				</div>
-				{isShowingFeedback ? (
+				{showSuccess ? (
+					<QuizSuccessStep 
+						answers={prepareAnswers()} 
+						quizTitle='Quiz Encontro 03'
+						onPrevious={handlePreviousEncounter}
+						onNext={handleNextEncounter}
+					/>
+				) : isShowingFeedback ? (
 					isSubjective ? (
 						<QuizSubjectiveFeedbackStep
 							question={currentQuestionData}
